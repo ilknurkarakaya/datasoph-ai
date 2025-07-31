@@ -1,294 +1,274 @@
 """
 DATASOPH AI - Document Processor
-Intelligent document processing with support for PDF, DOCX, TXT, and CSV files
+Handles document loading, chunking, and preprocessing for RAG system
 """
 
-from langchain.document_loaders import PyPDFLoader, Docx2txtLoader, TextLoader, CSVLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter, TokenTextSplitter
-from typing import List, Dict, Any, Optional
 import os
-import hashlib
-import logging
+import re
+from typing import List, Dict, Any, Optional
 from pathlib import Path
+import logging
+
+# Document processing imports
+from pypdf import PdfReader
+from docx import Document
 import pandas as pd
-import docx2txt
 
-from app.core.config import settings
+# LangChain imports
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.schema import Document as LangChainDocument
 
+# Configure logging
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class DocumentProcessor:
-    """Advanced document processing with intelligent chunking"""
+    """
+    Document Processor for RAG System
+    Handles PDF, DOCX, TXT, and CSV files
+    """
     
-    def __init__(self):
-        self.chunk_size = settings.CHUNK_SIZE
-        self.chunk_overlap = settings.CHUNK_OVERLAP
-        
-        # Initialize text splitters
-        self.recursive_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=self.chunk_size,
-            chunk_overlap=self.chunk_overlap,
-            separators=["\n\n", "\n", ". ", " ", ""],
-            length_function=len
-        )
-        
-        self.token_splitter = TokenTextSplitter(
-            chunk_size=self.chunk_size // 4,  # Approximate token count
-            chunk_overlap=self.chunk_overlap // 4
-        )
-    
-    async def process_document(
-        self,
-        file_path: str,
-        file_type: str,
-        chunk_strategy: str = "recursive"
-    ) -> List[Dict[str, Any]]:
+    def __init__(self, chunk_size: int = 1000, chunk_overlap: int = 200):
         """
-        Process document and return chunks with metadata
+        Initialize Document Processor
+        
+        Args:
+            chunk_size: Size of text chunks
+            chunk_overlap: Overlap between chunks
+        """
+        self.chunk_size = chunk_size
+        self.chunk_overlap = chunk_overlap
+        self.text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=chunk_size,
+            chunk_overlap=chunk_overlap,
+            length_function=len,
+            separators=["\n\n", "\n", " ", ""]
+        )
+        
+        # Supported file types
+        self.supported_extensions = {
+            '.pdf': self._process_pdf,
+            '.docx': self._process_docx,
+            '.txt': self._process_txt,
+            '.csv': self._process_csv,
+            '.json': self._process_json
+        }
+    
+    def process_document(self, file_path: str) -> List[LangChainDocument]:
+        """
+        Process a document and return chunks
+        
+        Args:
+            file_path: Path to the document
+            
+        Returns:
+            List of LangChain Document chunks
         """
         try:
-            logger.info(f"Processing document: {file_path} (type: {file_type})")
+            file_path = Path(file_path)
             
-            # Load document based on type
-            documents = await self._load_document(file_path, file_type)
+            if not file_path.exists():
+                raise FileNotFoundError(f"File not found: {file_path}")
             
-            # Extract text content
-            full_text = ""
-            for doc in documents:
-                full_text += doc.page_content + "\n\n"
+            file_extension = file_path.suffix.lower()
             
-            # Generate document statistics
-            stats = self._calculate_document_stats(full_text, documents)
+            if file_extension not in self.supported_extensions:
+                raise ValueError(f"Unsupported file type: {file_extension}")
             
-            # Split into chunks
-            chunks = await self._split_into_chunks(documents, chunk_strategy)
+            # Extract text from document
+            text = self.supported_extensions[file_extension](file_path)
             
-            # Process chunks with metadata
-            processed_chunks = []
+            if not text.strip():
+                raise ValueError("Document is empty or could not be processed")
+            
+            # Split text into chunks
+            chunks = self.text_splitter.split_text(text)
+            
+            # Convert to LangChain Documents
+            documents = []
             for i, chunk in enumerate(chunks):
-                chunk_data = {
-                    "chunk_index": i,
-                    "content": chunk.page_content,
-                    "content_hash": self._generate_content_hash(chunk.page_content),
-                    "metadata": {
-                        **chunk.metadata,
-                        "file_path": file_path,
-                        "file_type": file_type,
-                        "chunk_strategy": chunk_strategy,
-                        "chunk_size": len(chunk.page_content),
-                        "word_count": len(chunk.page_content.split()),
-                        "character_count": len(chunk.page_content)
-                    },
-                    "document_stats": stats
-                }
-                processed_chunks.append(chunk_data)
+                doc = LangChainDocument(
+                    page_content=chunk,
+                    metadata={
+                        "source": str(file_path),
+                        "chunk_id": i,
+                        "total_chunks": len(chunks),
+                        "file_type": file_extension,
+                        "chunk_size": len(chunk)
+                    }
+                )
+                documents.append(doc)
             
-            logger.info(f"Successfully processed document into {len(processed_chunks)} chunks")
-            return processed_chunks
+            logger.info(f"Processed {file_path.name}: {len(documents)} chunks created")
+            return documents
             
         except Exception as e:
             logger.error(f"Error processing document {file_path}: {e}")
             raise
     
-    async def _load_document(self, file_path: str, file_type: str):
-        """Load document based on file type"""
+    def _process_pdf(self, file_path: Path) -> str:
+        """Extract text from PDF file"""
         try:
-            if file_type.lower() == "pdf":
-                loader = PyPDFLoader(file_path)
-            elif file_type.lower() in ["docx", "doc"]:
-                loader = Docx2txtLoader(file_path)
-            elif file_type.lower() == "txt":
-                loader = TextLoader(file_path, encoding='utf-8')
-            elif file_type.lower() == "csv":
-                loader = CSVLoader(file_path)
-            else:
-                raise ValueError(f"Unsupported file type: {file_type}")
+            reader = PdfReader(file_path)
+            text = ""
             
-            documents = loader.load()
-            return documents
+            for page_num, page in enumerate(reader.pages):
+                page_text = page.extract_text()
+                if page_text.strip():
+                    text += f"\n--- Page {page_num + 1} ---\n{page_text}\n"
+            
+            return text
             
         except Exception as e:
-            logger.error(f"Error loading document {file_path}: {e}")
+            logger.error(f"Error processing PDF {file_path}: {e}")
             raise
     
-    async def _split_into_chunks(self, documents, strategy: str):
-        """Split documents into chunks using specified strategy"""
+    def _process_docx(self, file_path: Path) -> str:
+        """Extract text from DOCX file"""
         try:
-            if strategy == "recursive":
-                chunks = self.recursive_splitter.split_documents(documents)
-            elif strategy == "token":
-                chunks = self.token_splitter.split_documents(documents)
-            elif strategy == "semantic":
-                chunks = await self._semantic_chunking(documents)
-            elif strategy == "fixed":
-                chunks = await self._fixed_chunking(documents)
-            else:
-                # Default to recursive
-                chunks = self.recursive_splitter.split_documents(documents)
+            doc = Document(file_path)
+            text = ""
             
-            return chunks
+            for paragraph in doc.paragraphs:
+                if paragraph.text.strip():
+                    text += paragraph.text + "\n"
+            
+            return text
             
         except Exception as e:
-            logger.error(f"Error splitting documents: {e}")
+            logger.error(f"Error processing DOCX {file_path}: {e}")
             raise
     
-    async def _semantic_chunking(self, documents):
-        """Semantic chunking based on content structure"""
+    def _process_txt(self, file_path: Path) -> str:
+        """Extract text from TXT file"""
         try:
-            # This is a simplified semantic chunking
-            # In a production system, you might use more advanced NLP techniques
-            chunks = []
+            with open(file_path, 'r', encoding='utf-8') as f:
+                return f.read()
+        except UnicodeDecodeError:
+            # Try with different encoding
+            with open(file_path, 'r', encoding='latin-1') as f:
+                return f.read()
+        except Exception as e:
+            logger.error(f"Error processing TXT {file_path}: {e}")
+            raise
+    
+    def _process_csv(self, file_path: Path) -> str:
+        """Extract text from CSV file"""
+        try:
+            df = pd.read_csv(file_path)
             
-            for doc in documents:
-                content = doc.page_content
-                
-                # Split by paragraphs first
-                paragraphs = content.split('\n\n')
-                
-                current_chunk = ""
-                for paragraph in paragraphs:
-                    # If adding this paragraph would exceed chunk size, create a new chunk
-                    if len(current_chunk) + len(paragraph) > self.chunk_size:
-                        if current_chunk:
-                            chunk_doc = doc.__class__(
-                                page_content=current_chunk.strip(),
-                                metadata=doc.metadata
-                            )
-                            chunks.append(chunk_doc)
-                        current_chunk = paragraph
-                    else:
-                        current_chunk += "\n\n" + paragraph if current_chunk else paragraph
-                
-                # Add the last chunk
-                if current_chunk:
-                    chunk_doc = doc.__class__(
-                        page_content=current_chunk.strip(),
-                        metadata=doc.metadata
-                    )
-                    chunks.append(chunk_doc)
+            # Convert DataFrame to text representation
+            text = f"CSV Document: {file_path.name}\n"
+            text += f"Shape: {df.shape}\n"
+            text += f"Columns: {list(df.columns)}\n\n"
             
-            return chunks
+            # Add sample data
+            text += "Sample Data:\n"
+            text += df.head(10).to_string()
+            
+            # Add column descriptions
+            text += "\n\nColumn Descriptions:\n"
+            for col in df.columns:
+                text += f"- {col}: {df[col].dtype}\n"
+            
+            return text
             
         except Exception as e:
-            logger.error(f"Error in semantic chunking: {e}")
-            # Fallback to recursive chunking
-            return self.recursive_splitter.split_documents(documents)
+            logger.error(f"Error processing CSV {file_path}: {e}")
+            raise
     
-    async def _fixed_chunking(self, documents):
-        """Fixed size chunking with overlap"""
+    def _process_json(self, file_path: Path) -> str:
+        """Extract text from JSON file"""
         try:
-            chunks = []
+            import json
+            with open(file_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
             
-            for doc in documents:
-                content = doc.page_content
-                
-                # Split into fixed size chunks
-                start = 0
-                while start < len(content):
-                    end = min(start + self.chunk_size, len(content))
-                    chunk_content = content[start:end]
-                    
-                    chunk_doc = doc.__class__(
-                        page_content=chunk_content,
-                        metadata={**doc.metadata, "chunk_start": start, "chunk_end": end}
-                    )
-                    chunks.append(chunk_doc)
-                    
-                    # Move start position with overlap
-                    start += self.chunk_size - self.chunk_overlap
-                    if start >= len(content):
-                        break
+            # Convert JSON to text representation
+            text = f"JSON Document: {file_path.name}\n"
+            text += json.dumps(data, indent=2, ensure_ascii=False)
             
-            return chunks
+            return text
             
         except Exception as e:
-            logger.error(f"Error in fixed chunking: {e}")
-            return self.recursive_splitter.split_documents(documents)
+            logger.error(f"Error processing JSON {file_path}: {e}")
+            raise
     
-    def _calculate_document_stats(self, full_text: str, documents) -> Dict[str, Any]:
-        """Calculate document statistics"""
-        try:
-            stats = {
-                "total_characters": len(full_text),
-                "total_words": len(full_text.split()),
-                "total_pages": len(documents),
-                "estimated_tokens": len(full_text) // 4,  # Rough estimate
-                "language": "en"  # Could be detected using langdetect library
-            }
+    def process_multiple_documents(self, file_paths: List[str]) -> List[LangChainDocument]:
+        """
+        Process multiple documents
+        
+        Args:
+            file_paths: List of file paths
             
-            return stats
-            
-        except Exception as e:
-            logger.error(f"Error calculating document stats: {e}")
-            return {}
+        Returns:
+            List of all document chunks
+        """
+        all_documents = []
+        
+        for file_path in file_paths:
+            try:
+                documents = self.process_document(file_path)
+                all_documents.extend(documents)
+                logger.info(f"Successfully processed {file_path}")
+            except Exception as e:
+                logger.error(f"Failed to process {file_path}: {e}")
+                continue
+        
+        logger.info(f"Total documents processed: {len(all_documents)}")
+        return all_documents
     
-    def _generate_content_hash(self, content: str) -> str:
-        """Generate SHA256 hash of content"""
-        try:
-            return hashlib.sha256(content.encode('utf-8')).hexdigest()
-        except Exception as e:
-            logger.error(f"Error generating content hash: {e}")
-            return ""
+    def get_document_summary(self, documents: List[LangChainDocument]) -> Dict[str, Any]:
+        """
+        Get summary of processed documents
+        
+        Args:
+            documents: List of processed documents
+            
+        Returns:
+            Summary dictionary
+        """
+        if not documents:
+            return {"error": "No documents provided"}
+        
+        sources = set()
+        total_chunks = len(documents)
+        total_chars = sum(len(doc.page_content) for doc in documents)
+        
+        for doc in documents:
+            if "source" in doc.metadata:
+                sources.add(doc.metadata["source"])
+        
+        return {
+            "total_documents": len(sources),
+            "total_chunks": total_chunks,
+            "total_characters": total_chars,
+            "average_chunk_size": total_chars / total_chunks if total_chunks > 0 else 0,
+            "sources": list(sources),
+            "chunk_size": self.chunk_size,
+            "chunk_overlap": self.chunk_overlap
+        }
+
+
+def main():
+    """Demo function for Document Processor"""
+    print("📄 DATASOPH AI - Document Processor Demo")
+    print("=" * 50)
     
-    async def extract_metadata(self, file_path: str, file_type: str) -> Dict[str, Any]:
-        """Extract metadata from document"""
-        try:
-            metadata = {
-                "filename": Path(file_path).name,
-                "file_size": os.path.getsize(file_path),
-                "file_type": file_type,
-                "created_at": os.path.getctime(file_path),
-                "modified_at": os.path.getmtime(file_path)
-            }
-            
-            # Type-specific metadata extraction
-            if file_type.lower() == "pdf":
-                metadata.update(await self._extract_pdf_metadata(file_path))
-            elif file_type.lower() in ["docx", "doc"]:
-                metadata.update(await self._extract_docx_metadata(file_path))
-            
-            return metadata
-            
-        except Exception as e:
-            logger.error(f"Error extracting metadata from {file_path}: {e}")
-            return {}
+    # Initialize processor
+    processor = DocumentProcessor(chunk_size=1000, chunk_overlap=200)
     
-    async def _extract_pdf_metadata(self, file_path: str) -> Dict[str, Any]:
-        """Extract PDF-specific metadata"""
-        try:
-            # This would require PyPDF2 or similar library for more detailed metadata
-            loader = PyPDFLoader(file_path)
-            documents = loader.load()
-            
-            return {
-                "page_count": len(documents),
-                "pdf_metadata": {}  # Could extract title, author, creation date, etc.
-            }
-            
-        except Exception as e:
-            logger.error(f"Error extracting PDF metadata: {e}")
-            return {}
+    print(f"Supported file types: {list(processor.supported_extensions.keys())}")
+    print(f"Chunk size: {processor.chunk_size}")
+    print(f"Chunk overlap: {processor.chunk_overlap}")
+    print("-" * 50)
     
-    async def _extract_docx_metadata(self, file_path: str) -> Dict[str, Any]:
-        """Extract DOCX-specific metadata"""
-        try:
-            # Extract basic DOCX information
-            text = docx2txt.process(file_path)
-            
-            return {
-                "word_count": len(text.split()),
-                "character_count": len(text),
-                "docx_metadata": {}  # Could extract more detailed metadata
-            }
-            
-        except Exception as e:
-            logger.error(f"Error extracting DOCX metadata: {e}")
-            return {}
-    
-    def get_supported_file_types(self) -> List[str]:
-        """Get list of supported file types"""
-        return ["pdf", "docx", "doc", "txt", "csv"]
-    
-    def validate_file_type(self, file_type: str) -> bool:
-        """Validate if file type is supported"""
-        return file_type.lower() in self.get_supported_file_types() 
+    # Example usage
+    print("Example usage:")
+    print("processor = DocumentProcessor()")
+    print("documents = processor.process_document('sample.pdf')")
+    print("summary = processor.get_document_summary(documents)")
+
+
+if __name__ == "__main__":
+    main() 

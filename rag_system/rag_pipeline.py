@@ -1,433 +1,279 @@
 """
 DATASOPH AI - RAG Pipeline
-Complete RAG workflow with LangChain integration and conversation memory
+Main RAG system that combines document processing, vector storage, and retrieval
 """
 
-from langchain.chains import RetrievalQA, ConversationalRetrievalChain
-from langchain.memory import ConversationBufferMemory, ConversationSummaryBufferMemory
-from langchain.prompts import PromptTemplate
-from typing import Dict, List, Any, Optional
+import os
 import logging
-from datetime import datetime
+from typing import List, Dict, Any, Optional
+from pathlib import Path
+import json
 
-from .vector_store import VectorStoreManager
-from .document_processor import DocumentProcessor
-from app.services.openrouter_service import openrouter_service
+# LangChain imports
+from langchain.chat_models import ChatOpenAI
+from langchain.schema import Document
+from langchain.prompts import ChatPromptTemplate
+from langchain.chains import LLMChain
 
+# Local imports
+from document_processor import DocumentProcessor
+from vector_store import VectorStore
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class RAGPipeline:
-    """Advanced RAG pipeline with conversation memory and context awareness"""
+    """
+    RAG Pipeline for DATASOPH AI
+    Combines document processing, vector storage, and retrieval
+    """
     
-    def __init__(self, vector_store_manager: VectorStoreManager):
-        self.vector_store_manager = vector_store_manager
-        self.document_processor = DocumentProcessor()
-        self.llm_service = openrouter_service
-        
-        # Initialize conversation memory
-        self.memory = ConversationBufferMemory(
-            memory_key="chat_history",
-            return_messages=True,
-            output_key="answer"
-        )
-        
-        # Custom prompt templates
-        self._initialize_prompts()
-        
-        # RAG chain
-        self.rag_chain = None
-    
-    def _initialize_prompts(self):
-        """Initialize custom prompt templates for RAG"""
-        
-        # System prompt for RAG responses
-        self.system_prompt = """You are Datasoph AI, an expert data scientist and AI assistant. You have access to relevant documents and should use them to provide accurate, helpful responses.
-
-When answering questions:
-1. Use the provided context from documents to support your answers
-2. If the context doesn't contain relevant information, say so clearly
-3. Cite specific sources when referencing document content
-4. Be concise but thorough in your explanations
-5. If asked about data analysis, provide practical insights and recommendations
-
-Always maintain a friendly, professional, and helpful tone."""
-
-        # RAG prompt template
-        self.rag_template = """Use the following pieces of context to answer the question at the end. If you don't know the answer based on the context, just say that you don't know, don't try to make up an answer.
-
-Context:
-{context}
-
-Question: {question}
-
-Helpful Answer:"""
-
-        self.rag_prompt = PromptTemplate(
-            template=self.rag_template,
-            input_variables=["context", "question"]
-        )
-        
-        # Conversational RAG template
-        self.conversational_template = """Use the following pieces of context and chat history to answer the question at the end. If you don't know the answer based on the context, just say that you don't know.
-
-Context:
-{context}
-
-Chat History:
-{chat_history}
-
-Question: {question}
-
-Helpful Answer:"""
-
-        self.conversational_prompt = PromptTemplate(
-            template=self.conversational_template,
-            input_variables=["context", "chat_history", "question"]
-        )
-    
-    async def setup_rag_chain(
-        self,
-        collection_name: str,
-        chain_type: str = "conversational",
-        search_kwargs: Optional[Dict] = None
-    ):
+    def __init__(self, 
+                 api_key: Optional[str] = None,
+                 chunk_size: int = 1000,
+                 chunk_overlap: int = 200):
         """
-        Setup RAG chain with specified configuration
+        Initialize RAG Pipeline
+        
+        Args:
+            api_key: OpenAI API key
+            chunk_size: Size of text chunks
+            chunk_overlap: Overlap between chunks
         """
-        try:
-            # Load vector store collection
-            success = await self.vector_store_manager.load_collection(collection_name)
-            if not success:
-                raise Exception(f"Failed to load collection: {collection_name}")
-            
-            # Configure retriever
-            search_kwargs = search_kwargs or {"k": 4}
-            retriever = self.vector_store_manager.vector_store.as_retriever(
-                search_kwargs=search_kwargs
+        self.api_key = api_key or os.getenv("OPENAI_API_KEY")
+        self.chunk_size = chunk_size
+        self.chunk_overlap = chunk_overlap
+        
+        # Initialize components
+        self.document_processor = DocumentProcessor(chunk_size, chunk_overlap)
+        self.vector_store = VectorStore(api_key=self.api_key)
+        
+        # Initialize LLM
+        self.llm = None
+        if self.api_key:
+            self.llm = ChatOpenAI(
+                temperature=0.7,
+                model="gpt-4",
+                openai_api_key=self.api_key
             )
-            
-            if chain_type == "conversational":
-                # Setup conversational retrieval chain
-                self.rag_chain = ConversationalRetrievalChain.from_llm(
-                    llm=self._create_llm_wrapper(),
-                    retriever=retriever,
-                    memory=self.memory,
-                    return_source_documents=True,
-                    verbose=True,
-                    chain_type="stuff",
-                    combine_docs_chain_kwargs={"prompt": self.conversational_prompt}
-                )
-            else:
-                # Setup basic retrieval QA chain
-                self.rag_chain = RetrievalQA.from_chain_type(
-                    llm=self._create_llm_wrapper(),
-                    chain_type="stuff",
-                    retriever=retriever,
-                    return_source_documents=True,
-                    chain_type_kwargs={"prompt": self.rag_prompt}
-                )
-            
-            logger.info(f"RAG chain setup completed for collection: {collection_name}")
-            
-        except Exception as e:
-            logger.error(f"Error setting up RAG chain: {e}")
-            raise
+        
+        # Initialize prompt template
+        self.prompt_template = ChatPromptTemplate.from_template("""
+        You are DATASOPH AI, an expert assistant that helps users find information from their documents.
+        
+        Context from documents:
+        {context}
+        
+        User question: {question}
+        
+        Please provide a comprehensive answer based on the context provided. If the context doesn't contain enough information to answer the question, say so. Be helpful and professional in your response.
+        
+        Answer:
+        """)
+        
+        # Initialize LLM chain
+        if self.llm:
+            self.llm_chain = LLMChain(llm=self.llm, prompt=self.prompt_template)
+        
+        logger.info("RAG Pipeline initialized successfully")
     
-    async def query_documents(
-        self,
-        question: str,
-        collection_name: Optional[str] = None,
-        user_id: Optional[str] = None,
-        context: Optional[Dict] = None
-    ) -> Dict[str, Any]:
+    def upload_documents(self, file_paths: List[str]) -> Dict[str, Any]:
         """
-        Query documents using RAG pipeline
+        Upload and process documents
+        
+        Args:
+            file_paths: List of file paths to process
+            
+        Returns:
+            Processing results
         """
         try:
-            start_time = datetime.now()
+            logger.info(f"Processing {len(file_paths)} documents")
             
-            # Setup RAG chain if not already done
-            if not self.rag_chain and collection_name:
-                await self.setup_rag_chain(collection_name)
+            # Process documents
+            documents = self.document_processor.process_multiple_documents(file_paths)
             
-            if not self.rag_chain:
-                raise Exception("RAG chain not initialized")
-            
-            # Add user context to the question if provided
-            if context:
-                contextualized_question = self._add_context_to_question(question, context)
-            else:
-                contextualized_question = question
-            
-            # Execute RAG query
-            if hasattr(self.rag_chain, 'acall'):
-                # Async call if available
-                response = await self.rag_chain.acall({
-                    "question": contextualized_question,
-                    "chat_history": self.memory.chat_memory.messages if hasattr(self.memory, 'chat_memory') else []
-                })
-            else:
-                # Sync call fallback
-                response = self.rag_chain({
-                    "question": contextualized_question
-                })
-            
-            # Process response
-            result = await self._process_rag_response(
-                response, question, user_id, start_time
-            )
-            
-            logger.info(f"RAG query completed for question: {question[:50]}...")
-            return result
-            
-        except Exception as e:
-            logger.error(f"Error in RAG query: {e}")
-            return {
-                "answer": f"I encountered an error while processing your question: {str(e)}",
-                "error": str(e),
-                "source_documents": [],
-                "processing_time": 0,
-                "question": question
-            }
-    
-    async def _process_rag_response(
-        self,
-        response: Dict,
-        original_question: str,
-        user_id: Optional[str],
-        start_time: datetime
-    ) -> Dict[str, Any]:
-        """
-        Process and format RAG response
-        """
-        try:
-            processing_time = (datetime.now() - start_time).total_seconds()
-            
-            # Extract answer
-            answer = response.get("answer", "No answer provided")
-            
-            # Process source documents
-            source_docs = response.get("source_documents", [])
-            processed_sources = []
-            
-            for i, doc in enumerate(source_docs):
-                source_info = {
-                    "index": i,
-                    "content": doc.page_content,
-                    "metadata": doc.metadata,
-                    "source": doc.metadata.get("source", "unknown"),
-                    "page": doc.metadata.get("page", None),
-                    "relevance_score": doc.metadata.get("relevance_score", 0.0)
+            if not documents:
+                return {
+                    "success": False,
+                    "error": "No documents were successfully processed"
                 }
-                processed_sources.append(source_info)
             
-            # Get relevant chunks for additional context
-            try:
-                additional_chunks = await self.vector_store_manager.similarity_search(
-                    original_question, k=2
-                )
-            except Exception as e:
-                logger.warning(f"Could not get additional chunks: {e}")
-                additional_chunks = []
+            # Add to vector store
+            success = self.vector_store.add_documents(documents)
             
-            return {
-                "answer": answer,
-                "source_documents": processed_sources,
-                "relevant_chunks": additional_chunks,
-                "question": original_question,
-                "processing_time": processing_time,
-                "timestamp": datetime.now().isoformat(),
-                "user_id": user_id,
-                "has_sources": len(processed_sources) > 0,
-                "confidence_score": self._calculate_confidence_score(
-                    answer, processed_sources
-                )
-            }
+            if not success:
+                return {
+                    "success": False,
+                    "error": "Failed to add documents to vector store"
+                }
             
-        except Exception as e:
-            logger.error(f"Error processing RAG response: {e}")
-            return {
-                "answer": "Error processing response",
-                "error": str(e),
-                "source_documents": [],
-                "processing_time": 0,
-                "question": original_question
-            }
-    
-    def _add_context_to_question(self, question: str, context: Dict) -> str:
-        """
-        Add user context to the question for better RAG results
-        """
-        try:
-            context_parts = []
-            
-            if context.get("user_name"):
-                context_parts.append(f"User: {context['user_name']}")
-            
-            if context.get("previous_topic"):
-                context_parts.append(f"Previous topic: {context['previous_topic']}")
-            
-            if context.get("specific_focus"):
-                context_parts.append(f"Focus on: {context['specific_focus']}")
-            
-            if context_parts:
-                context_string = " | ".join(context_parts)
-                return f"[Context: {context_string}] {question}"
-            
-            return question
-            
-        except Exception as e:
-            logger.error(f"Error adding context to question: {e}")
-            return question
-    
-    def _calculate_confidence_score(
-        self,
-        answer: str,
-        source_docs: List[Dict]
-    ) -> float:
-        """
-        Calculate confidence score based on answer and sources
-        """
-        try:
-            if not source_docs:
-                return 0.2  # Low confidence without sources
-            
-            # Base confidence from number of sources
-            source_confidence = min(0.8, len(source_docs) * 0.2)
-            
-            # Boost confidence if answer references specific facts/numbers
-            import re
-            has_numbers = bool(re.search(r'\d+', answer))
-            has_specifics = any(word in answer.lower() for word in [
-                'according to', 'the document states', 'as mentioned',
-                'specifically', 'precisely', 'data shows'
-            ])
-            
-            specificity_boost = 0.1 if has_numbers else 0.0
-            specificity_boost += 0.1 if has_specifics else 0.0
-            
-            # Final confidence score
-            confidence = min(1.0, source_confidence + specificity_boost)
-            
-            return round(confidence, 2)
-            
-        except Exception as e:
-            logger.error(f"Error calculating confidence score: {e}")
-            return 0.5
-    
-    def _create_llm_wrapper(self):
-        """
-        Create LLM wrapper for LangChain integration
-        """
-        from langchain.llms.base import LLM
-        from langchain.callbacks.manager import CallbackManagerForLLMRun
-        from typing import Optional, List, Any
-        
-        class OpenRouterLLM(LLM):
-            """Custom LLM wrapper for OpenRouter"""
-            
-            def __init__(self, openrouter_service, model: str = None):
-                super().__init__()
-                self.openrouter_service = openrouter_service
-                self.model = model or "anthropic/claude-3-sonnet"
-            
-            @property
-            def _llm_type(self) -> str:
-                return "openrouter"
-            
-            def _call(
-                self,
-                prompt: str,
-                stop: Optional[List[str]] = None,
-                run_manager: Optional[CallbackManagerForLLMRun] = None,
-                **kwargs: Any,
-            ) -> str:
-                # Convert prompt to messages format
-                messages = [{"role": "user", "content": prompt}]
-                
-                # Make synchronous call (LangChain requires sync)
-                import asyncio
-                loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(loop)
-                
-                try:
-                    response = loop.run_until_complete(
-                        self.openrouter_service.create_chat_completion(
-                            messages=messages,
-                            model=self.model,
-                            **kwargs
-                        )
-                    )
-                    
-                    return response["choices"][0]["message"]["content"]
-                finally:
-                    loop.close()
-        
-        return OpenRouterLLM(self.llm_service)
-    
-    async def process_and_index_document(
-        self,
-        file_path: str,
-        file_type: str,
-        collection_name: str,
-        metadata: Optional[Dict] = None
-    ) -> Dict[str, Any]:
-        """
-        Process document and add to vector store
-        """
-        try:
-            # Process document
-            chunks = await self.document_processor.process_document(
-                file_path, file_type
-            )
-            
-            # Add custom metadata if provided
-            if metadata:
-                for chunk in chunks:
-                    chunk["metadata"].update(metadata)
-            
-            # Create or load collection
-            try:
-                await self.vector_store_manager.load_collection(collection_name)
-                # Add to existing collection
-                ids = await self.vector_store_manager.add_documents(chunks)
-            except:
-                # Create new collection
-                collection_id = await self.vector_store_manager.create_collection(
-                    collection_name, chunks
-                )
+            # Get summary
+            summary = self.document_processor.get_document_summary(documents)
             
             return {
                 "success": True,
-                "collection_name": collection_name,
-                "chunks_processed": len(chunks),
-                "file_path": file_path,
-                "file_type": file_type
+                "documents_processed": len(file_paths),
+                "chunks_created": len(documents),
+                "summary": summary
             }
             
         except Exception as e:
-            logger.error(f"Error processing and indexing document: {e}")
+            logger.error(f"Error uploading documents: {e}")
             return {
                 "success": False,
-                "error": str(e),
-                "file_path": file_path
+                "error": str(e)
             }
     
-    def clear_memory(self):
-        """Clear conversation memory"""
+    def ask_question(self, question: str, k: int = 5) -> Dict[str, Any]:
+        """
+        Ask a question and get answer based on uploaded documents
+        
+        Args:
+            question: User's question
+            k: Number of similar documents to retrieve
+            
+        Returns:
+            Answer and context
+        """
         try:
-            self.memory.clear()
-            logger.info("Conversation memory cleared")
+            if not self.llm:
+                return self._mock_answer(question)
+            
+            # Search for relevant documents
+            similar_docs = self.vector_store.similarity_search(question, k=k)
+            
+            if not similar_docs:
+                return {
+                    "success": False,
+                    "error": "No relevant documents found",
+                    "answer": "I couldn't find any relevant information in the uploaded documents to answer your question."
+                }
+            
+            # Prepare context
+            context = "\n\n".join([doc.page_content for doc, _ in similar_docs])
+            
+            # Generate answer
+            response = self.llm_chain.run({
+                "context": context,
+                "question": question
+            })
+            
+            # Prepare sources
+            sources = []
+            for doc, _ in similar_docs:
+                if "source" in doc.metadata:
+                    sources.append(doc.metadata["source"])
+            
+            return {
+                "success": True,
+                "answer": response,
+                "sources": list(set(sources)),
+                "context_documents": len(similar_docs),
+                "question": question
+            }
+            
         except Exception as e:
-            logger.error(f"Error clearing memory: {e}")
+            logger.error(f"Error asking question: {e}")
+            return {
+                "success": False,
+                "error": str(e)
+            }
     
-    def get_memory_summary(self) -> str:
-        """Get summary of conversation memory"""
+    def _mock_answer(self, question: str) -> Dict[str, Any]:
+        """Generate mock answer when LLM is not available"""
+        question_lower = question.lower()
+        
+        if "what" in question_lower and "document" in question_lower:
+            answer = "Based on the uploaded documents, I can help you find information. Please ask specific questions about the content."
+        elif "how" in question_lower and "work" in question_lower:
+            answer = "The RAG system works by processing your documents, creating embeddings, and using similarity search to find relevant information when you ask questions."
+        elif "upload" in question_lower or "add" in question_lower:
+            answer = "You can upload PDF, DOCX, TXT, CSV, and JSON files. The system will process them and make the content searchable."
+        else:
+            answer = f"I understand you're asking about: '{question}'. This is a demonstration of the RAG system. In a real implementation with API access, I would search through your uploaded documents to provide specific answers."
+        
+        return {
+            "success": True,
+            "answer": answer,
+            "sources": ["Mock response - no API key provided"],
+            "context_documents": 0,
+            "question": question
+        }
+    
+    def get_system_stats(self) -> Dict[str, Any]:
+        """Get system statistics"""
         try:
-            if hasattr(self.memory, 'chat_memory') and self.memory.chat_memory.messages:
-                messages = self.memory.chat_memory.messages
-                return f"Conversation history: {len(messages)} messages"
-            return "No conversation history"
+            vector_stats = self.vector_store.get_collection_stats()
+            
+            stats = {
+                "rag_system": "DATASOPH AI RAG Pipeline",
+                "api_connected": self.api_key is not None,
+                "chunk_size": self.chunk_size,
+                "chunk_overlap": self.chunk_overlap,
+                "vector_store": vector_stats,
+                "supported_file_types": list(self.document_processor.supported_extensions.keys())
+            }
+            
+            return stats
+            
         except Exception as e:
-            logger.error(f"Error getting memory summary: {e}")
-            return "Memory unavailable" 
+            logger.error(f"Error getting system stats: {e}")
+            return {"error": str(e)}
+    
+    def reset_system(self) -> bool:
+        """Reset the entire RAG system"""
+        try:
+            success = self.vector_store.reset_collection()
+            if success:
+                logger.info("RAG system reset successfully")
+            return success
+        except Exception as e:
+            logger.error(f"Error resetting RAG system: {e}")
+            return False
+    
+    def export_system_info(self) -> Dict[str, Any]:
+        """Export system information"""
+        try:
+            stats = self.get_system_stats()
+            vector_info = self.vector_store.export_collection_info()
+            
+            export_data = {
+                "system_stats": stats,
+                "vector_store_info": vector_info,
+                "export_timestamp": str(Path().absolute())
+            }
+            
+            return export_data
+            
+        except Exception as e:
+            logger.error(f"Error exporting system info: {e}")
+            return {"error": str(e)}
+
+
+def main():
+    """Demo function for RAG Pipeline"""
+    print("🔍 DATASOPH AI - RAG Pipeline Demo")
+    print("=" * 50)
+    
+    # Initialize RAG pipeline
+    rag = RAGPipeline()
+    
+    # Show system stats
+    stats = rag.get_system_stats()
+    print(f"RAG System: {stats['rag_system']}")
+    print(f"API Connected: {stats['api_connected']}")
+    print(f"Supported file types: {stats['supported_file_types']}")
+    print(f"Chunk size: {stats['chunk_size']}")
+    print("-" * 50)
+    
+    # Example usage
+    print("Example usage:")
+    print("rag = RAGPipeline()")
+    print("rag.upload_documents(['document.pdf'])")
+    print("answer = rag.ask_question('What is this document about?')")
+
+
+if __name__ == "__main__":
+    main() 
