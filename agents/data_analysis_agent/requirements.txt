@@ -1,0 +1,8 @@
+# Data Analysis Agent Requirements
+langchain>=0.0.300
+langchain-openai>=0.0.1
+langchain-community>=0.0.1
+pandas>=2.0.0
+numpy>=1.20.0
+streamlit>=1.25.0
+openai>=1.0.0 
