@@ -14,30 +14,26 @@ const WelcomeLayout: React.FC<WelcomeLayoutProps> = ({
   onSendMessage 
 }) => {
   return (
-    <div className="flex flex-col items-center justify-center min-h-full px-6 py-8 overflow-y-auto">
-      {/* Hero Section */}
-      <div className="text-center mb-8 max-w-2xl">
-        {/* DataSoph Spiral Logo */}
-        <div className="flex items-center justify-center mb-6">
+    <div className="relative min-h-screen px-6">
+      {/* Logo positioned at top */}
+      <div className="absolute top-1/4 left-1/2 transform -translate-x-1/2 flex flex-col items-center text-center">
+        <div className="flex items-center justify-center mb-4">
           <div className="w-20 h-20 flex items-center justify-center">
             <DataSophLogo 
-              size={64} 
+              size={72} 
               className="drop-shadow-sm" 
               color="#ffde59"
             />
           </div>
         </div>
         
-        {/* Welcome Text */}
-        <h1 className="text-3xl font-medium text-[var(--text-primary)] mb-4 font-system">
-          How can I help you today? {/* Updated v5.0 */}
+        <h1 className="text-4xl font-medium text-[var(--text-primary)] font-system">
+          How can I help you today? {/* Updated v8.2 - Bigger Font */}
         </h1>
-
-
       </div>
 
-      {/* Centered Input */}
-      <div className="w-full max-w-3xl">
+      {/* Chat Input - EXACTLY in the center of viewport */}
+      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-3xl px-6">
         <CenteredInput
           inputValue={inputValue}
           setInputValue={setInputValue}

@@ -21,6 +21,53 @@ const ClaudeChatArea: React.FC = () => {
   const { toggleSidebar } = useSidebar();
   const { hasMessages, setHasMessages, onNewChat } = useChat();
   
+  // Load chat history on component mount and when localStorage changes
+  useEffect(() => {
+    const loadChatHistory = () => {
+      const savedMessages = localStorage.getItem('datasoph-chat-history');
+      if (savedMessages) {
+        try {
+          const parsedMessages = JSON.parse(savedMessages);
+          setMessages(parsedMessages);
+          setHasMessages(parsedMessages.length > 0);
+        } catch (error) {
+          console.error('Error loading chat history:', error);
+        }
+      } else {
+        setMessages([]);
+        setHasMessages(false);
+      }
+    };
+    
+    // Load initially
+    loadChatHistory();
+    
+    // Listen for localStorage changes (for chat switching)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'datasoph-chat-history') {
+        loadChatHistory();
+      }
+    };
+    
+    // Listen for custom events (for same-tab changes)
+    const handleChatSwitch = () => {
+      loadChatHistory();
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('chatSwitch', handleChatSwitch);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('chatSwitch', handleChatSwitch);
+    };
+  }, [setHasMessages]);
+  
+  // Save messages to localStorage whenever messages change
+  useEffect(() => {
+    localStorage.setItem('datasoph-chat-history', JSON.stringify(messages));
+  }, [messages]);
+  
   // Listen for new chat trigger
   useEffect(() => {
     const handleNewChat = () => {
@@ -278,17 +325,8 @@ What specific statistical question or hypothesis would you like to investigate?`
   
   return (
     <div className="flex flex-col h-full">
-      {/* Header with Sidebar Toggle */}
-      <div className="flex items-center p-3 border-b border-[var(--border-light)] bg-[var(--bg-main)] flex-shrink-0">
-        <button
-          onClick={toggleSidebar}
-          className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] rounded-md transition-colors"
-          title="Toggle sidebar"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-        </button>
+      {/* Clean header without border */}
+      <div className="flex items-center p-3 bg-[var(--bg-main)] flex-shrink-0">
         <div className="flex-1" />
       </div>
       

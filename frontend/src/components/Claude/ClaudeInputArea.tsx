@@ -82,7 +82,7 @@ const ClaudeInputArea: React.FC<ClaudeInputAreaProps> = ({
       {/* Input Container with Drag & Drop */}
       <div 
         data-drop-zone="true"
-        className="flex items-end gap-2 relative"
+        className="flex items-end gap-2 relative p-3 border-[0.5px] border-[var(--border-light)] rounded-xl bg-[var(--bg-input)] shadow-sm hover:border-[var(--border-medium)] transition-colors"
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
         onDragOver={handleDragOver}
@@ -134,7 +134,7 @@ const ClaudeInputArea: React.FC<ClaudeInputAreaProps> = ({
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyPress}
             placeholder="Ask like you're working with a data scientist..."
-            className="w-full resize-none border-0 bg-transparent text-base text-[var(--text-primary)] placeholder-[var(--text-placeholder)] focus:outline-none font-system"
+            className="w-full resize-none border-0 bg-transparent text-base text-[var(--text-primary)] placeholder-[var(--text-placeholder)] focus:outline-none font-system pr-8"
             rows={1}
             style={{ minHeight: '24px', maxHeight: '120px' }}
           />
@@ -143,7 +143,7 @@ const ClaudeInputArea: React.FC<ClaudeInputAreaProps> = ({
           <button
             onClick={onSend}
             disabled={!inputValue.trim() || isTyping}
-            className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1 text-[var(--text-secondary)] hover:text-[var(--text-primary)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="absolute right-0 top-1/2 transform -translate-y-1/2 p-1 text-[var(--text-secondary)] hover:text-[var(--text-primary)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
@@ -160,8 +160,8 @@ const ClaudeInputArea: React.FC<ClaudeInputAreaProps> = ({
       )}
       
       {/* Footer Text */}
-      <div className="text-xs text-[var(--text-tertiary)] text-center mt-2">
-        DataSoph AI can make mistakes. Verify important analysis results.
+      <div className="text-[10px] text-[var(--text-tertiary)] text-center mt-2 opacity-70">
+        Datasoph.ai can make mistakes. Verify important analysis results.
       </div>
       
       {/* Hidden File Input */}

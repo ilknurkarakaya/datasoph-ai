@@ -58,8 +58,8 @@ const ConversationLayout: React.FC<ConversationLayoutProps> = ({
       </div>
       
       {/* Bottom Input */}
-      <div className="border-t border-[var(--border-light)] bg-[var(--bg-main)] flex-shrink-0">
-        <div className="max-w-3xl mx-auto px-6 py-4">
+      <div className="bg-[var(--bg-main)] flex-shrink-0">
+        <div className="max-w-3xl mx-auto px-6 py-3">
           <ClaudeInputArea
             inputValue={inputValue}
             setInputValue={setInputValue}

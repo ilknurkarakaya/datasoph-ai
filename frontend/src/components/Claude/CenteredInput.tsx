@@ -97,7 +97,7 @@ const CenteredInput: React.FC<CenteredInputProps> = ({
       {/* Main Input Container with Drag & Drop */}
       <div 
         data-drop-zone="true"
-        className="flex items-end gap-3 bg-[var(--bg-input)] border border-[var(--border-light)] rounded-2xl p-4 shadow-sm hover:shadow-md transition-all duration-200 relative"
+        className="flex items-end gap-3 bg-[var(--bg-input)] border border-[var(--border-light)] rounded-2xl px-4 py-3 shadow-sm hover:shadow-md transition-all duration-200 relative"
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
         onDragOver={handleDragOver}
@@ -178,8 +178,8 @@ const CenteredInput: React.FC<CenteredInputProps> = ({
       )}
       
       {/* Footer Text */}
-      <p className="text-xs text-[var(--text-tertiary)] text-center mt-3">
-        DataSoph AI can make mistakes. Verify important analysis results.
+      <p className="text-[10px] text-[var(--text-tertiary)] text-center mt-3 opacity-70">
+        Datasoph.ai can make mistakes. Verify important analysis results.
       </p>
       
       {/* Hidden File Input */}

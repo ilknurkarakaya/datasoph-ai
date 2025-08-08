@@ -35,7 +35,7 @@
   --border-focus: #d0d7de;              /* Focus border - same as normal */
   
   /* Avatars & Accents */
-  --avatar-user: #0969da;               /* User avatar (blue) */
+  --avatar-user: #f5f2eb;               /* User avatar (same as sidebar bg) */
   --avatar-ai: #f97316;                 /* AI avatar (orange) */
   --accent-orange: #f97316;             /* Claude orange */
   
@@ -65,7 +65,7 @@
   --border-focus: #30363d;              /* Focus border - same as normal */
   
   /* Avatars stay same in dark mode */
-  --avatar-user: #2188ff;               /* User avatar (lighter blue) */
+  --avatar-user: #1e1e1e;               /* User avatar (same as dark sidebar bg) */
   --avatar-ai: #f97316;                 /* AI avatar (same orange) */
   
   /* Buttons */
@@ -84,6 +84,8 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-size: var(--text-base);
+  height: 100%;
+  overflow: hidden;
 }
 
 body {
@@ -94,6 +96,8 @@ body {
   line-height: 1.5;
   font-weight: 400;
   transition: background-color 0.2s ease, color 0.2s ease;
+  height: 100%;
+  overflow: hidden;
 }
 
 /* Font Family Utilities */

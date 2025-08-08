@@ -258,11 +258,29 @@ function AppContent() {
 
   return (
     <div className="flex h-screen relative">
-      {/* Sidebar - Collapsible */}
+      {/* Sidebar - Collapsible with toggle */}
       <div className={`transition-all duration-300 ease-in-out ${
-        sidebarOpen ? 'w-[260px]' : 'w-0'
-      } bg-[var(--bg-sidebar)] border-r border-[var(--border-light)] flex flex-col overflow-hidden lg:relative absolute lg:z-auto z-50 h-full`}>
-        <ClaudeSidebar />
+        sidebarOpen ? 'w-[260px]' : 'w-12'
+      } bg-[var(--bg-sidebar)] flex flex-col ${sidebarOpen ? '' : 'items-center'} lg:relative absolute lg:z-auto z-50 h-full`}>
+        {/* Sidebar Content with integrated toggle */}
+        {sidebarOpen ? (
+          <div className="flex-1 flex flex-col overflow-hidden">
+            <ClaudeSidebar />
+          </div>
+        ) : (
+          /* Collapsed state - only toggle button */
+          <div className="p-3 flex-shrink-0">
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] rounded-md transition-colors"
+              title="Expand sidebar"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+          </div>
+        )}
       </div>
       
       {/* Main Chat Area - Adjusts to sidebar state */}
@@ -270,7 +288,7 @@ function AppContent() {
         <ClaudeChatArea />
       </div>
       
-      {/* Mobile Overlay */}
+      {/* Mobile Overlay - Only show when sidebar is open on mobile */}
       {sidebarOpen && (
         <div 
           className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
