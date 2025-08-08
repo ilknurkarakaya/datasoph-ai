@@ -1,394 +1,350 @@
-# 🧠 DATASOPH AI
+# 🚀 DataSoph.ai - Professional Data Science AI Platform
 
-**World's Most Intelligent AI Data Scientist with Advanced RAG, Authentication & Conversation Memory**
+> **World's Most Advanced AI Data Scientist** - A comprehensive, professional-grade data science workbench with cutting-edge AI capabilities.
 
-[![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)](https://python.org)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-green.svg)](https://fastapi.tiangolo.com)
-[![Streamlit](https://img.shields.io/badge/Streamlit-1.28+-red.svg)](https://streamlit.io)
-[![Flutter](https://img.shields.io/badge/Flutter-3.0+-blue.svg)](https://flutter.dev)
-[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)](https://github.com/datasoph/datasoph-ai)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![React](https://img.shields.io/badge/React-18.2.0-blue.svg)](https://reactjs.org/)
+[![Python](https://img.shields.io/badge/Python-3.8+-green.svg)](https://python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-Latest-orange.svg)](https://fastapi.tiangolo.com/)
 
-## 🚀 **Project Overview**
+## 🌟 Features Overview
 
-Datasoph AI is the most advanced AI data scientist application featuring:
+### 🏗️ **Complete Data Science Platform**
+- **🎯 Dashboard**: Professional project overview and analytics
+- **🤖 AI Assistant**: Intelligent chat interface with code generation
+- **💾 Data Workspace**: Advanced file handling and data exploration
+- **📊 Analysis Studio**: Statistical analysis and machine learning
+- **💻 Code Environment**: Jupyter-like notebook interface
+- **📋 Export Center**: Professional reporting and presentation
 
-- 🔐 **Complete Authentication System** - Firebase + JWT integration
-- 🤖 **OpenRouter AI Integration** - Access to Claude, GPT-4, and more
-- 📚 **Advanced RAG System** - ChromaDB with intelligent document processing
-- 🔗 **LangChain Agents** - Intelligent AI agents with memory and tools
-- 🌐 **Cross-platform Apps** - Streamlit web app + Flutter mobile
-- 📊 **Data Analysis Tools** - Comprehensive statistical analysis and visualization
+### 🧠 **AI Capabilities (Expert Level)**
 
-## ✨ **Working Features**
+#### **Machine Learning & Statistics**
+- **Supervised Learning**: Linear/Logistic Regression, Random Forest, XGBoost, Neural Networks
+- **Unsupervised Learning**: K-means, Hierarchical Clustering, PCA, t-SNE
+- **Deep Learning**: CNNs, RNNs, Transformers, GANs
+- **Statistical Analysis**: Hypothesis testing, ANOVA, Bayesian inference
+- **Time Series**: ARIMA, Prophet, seasonal decomposition
+- **Advanced Analytics**: A/B testing, survival analysis, causal inference
 
-### 🤖 **AI Chat Feature** (✅ COMPLETED)
-- **Interactive AI Chat**: Real-time conversation with AI assistant
-- **Multi-Model Support**: OpenRouter integration for multiple AI models
-- **Conversation Memory**: Maintains context across messages
-- **Mock Responses**: Works without API key for demo purposes
-- **Export Functionality**: Save conversations as JSON files
-- **Comprehensive Testing**: Full test suite included
+#### **Data Engineering & Quality**
+- **Auto Data Cleaning**: Missing value handling, outlier detection
+- **Feature Engineering**: Automated feature creation and selection
+- **Data Quality Assessment**: Comprehensive quality scoring
+- **ETL Pipelines**: Intelligent data transformation workflows
+- **Big Data Support**: Scalable processing for large datasets
 
-**Quick Start:**
-```bash
-cd features/ai_chat
-pip install -r requirements.txt
-python ai_chat_feature.py
-```
+#### **Business Intelligence**
+- **KPI Dashboards**: Real-time business metrics tracking
+- **Customer Analytics**: Segmentation, churn prediction, lifetime value
+- **Market Analysis**: Basket analysis, recommendation systems
+- **ROI Analysis**: Business impact measurement and reporting
 
-## 🏗️ **Architecture**
+### 📈 **Advanced Visualizations**
+- **Interactive Charts**: Plotly, D3.js integration
+- **Statistical Plots**: Box plots, violin plots, correlation matrices
+- **Business Dashboards**: Executive-ready presentations
+- **3D Visualizations**: Advanced spatial and network analysis
+- **Real-time Updates**: Live data streaming and monitoring
 
-```
-🚀 datasoph-ai/
-├── 🔥 backend/                 # FastAPI with JWT + Firebase
-├── 🌐 web_app/                 # Streamlit with authentication
-├── 📱 mobile_app/              # Flutter with Firebase Auth
-├── 🤖 langchain_agents/        # LangChain AI agents
-├── 🔍 rag_system/              # Complete RAG implementation
-├── 📊 analytics_engine/        # Advanced data science
-├── 🔐 auth_system/             # Complete authentication
-├── 💾 database/                # Database management
-├── 🚀 deployment/              # Deployment configuration
-└── ✨ features/                # Working features
-    └── ai_chat/               # AI Chat Feature (COMPLETED)
-```
+### 💻 **Code Generation & Execution**
+- **Multi-language Support**: Python, R, SQL
+- **Auto Code Generation**: Complete data science pipelines
+- **Best Practices**: Industry-standard code patterns
+- **Documentation**: Auto-generated comments and explanations
+- **Performance Optimization**: Efficient algorithms and data structures
 
-## ✨ **Key Features**
-
-### 🔐 **Authentication & Security**
-- Firebase Authentication integration
-- JWT token management with refresh tokens
-- Secure password hashing with bcrypt
-- Multi-factor authentication support
-- Session management with Redis
-
-### 🤖 **AI & Machine Learning**
-- OpenRouter integration for multiple AI models (Claude, GPT-4, Llama 2)
-- LangChain agents with memory and tools
-- Conversation history and context awareness
-- Advanced prompt engineering and optimization
-
-### 📚 **RAG System**
-- ChromaDB vector database with persistent storage
-- Intelligent document processing (PDF, DOCX, TXT, CSV)
-- Semantic chunking and retrieval
-- Multi-modal document support
-- Real-time document indexing
-
-### 📊 **Data Analysis**
-- Comprehensive statistical analysis
-- Advanced visualization with Plotly and Matplotlib
-- Time series analysis and forecasting
-- Machine learning pipeline automation
-- Business intelligence insights
-
-### 🌐 **Web Application**
-- Modern Streamlit interface with custom CSS
-- Real-time chat with AI agents
-- Document upload and processing
-- Interactive data visualization
-- Responsive design for all devices
-
-### 📱 **Mobile Application**
-- Native Flutter app for iOS and Android
-- Firebase authentication integration
-- Real-time synchronization with backend
-- Offline capability with local storage
-- Push notifications for important updates
-
-## 🚀 **Quick Start**
+## 🚀 Quick Start
 
 ### Prerequisites
+- **Node.js** 18+ and npm/yarn
+- **Python** 3.8+ with pip
+- **Git** for version control
 
-- Python 3.9+
-- Node.js 16+
-- Flutter 3.0+
-- Docker and Docker Compose
-- Firebase project (for authentication)
-- OpenRouter API key
-- OpenAI API key (for embeddings)
-
-### 1. **Clone Repository**
-
+### 1. Clone Repository
 ```bash
-git clone https://github.com/yourusername/datasoph-ai.git
-cd datasoph-ai
+git clone https://github.com/datasoph/datasoph-ai.git
+cd DATASOPH_AI
 ```
 
-### 2. **Environment Setup**
-
+### 2. Backend Setup
 ```bash
-# Copy environment template
-cp .env.example .env
+# Navigate to backend
+cd backend
 
-# Edit environment variables
-nano .env
-```
-
-Required environment variables:
-```env
-# API Keys
-OPENROUTER_API_KEY=your-openrouter-api-key
-OPENAI_API_KEY=your-openai-api-key
-
-# Firebase Configuration
-FIREBASE_PROJECT_ID=your-firebase-project-id
-FIREBASE_PRIVATE_KEY=your-firebase-private-key
-FIREBASE_CLIENT_EMAIL=your-firebase-client-email
-
-# Database
-DATABASE_URL=sqlite:///./datasoph.db
-
-# Security
-SECRET_KEY=your-super-secret-key-change-in-production
-```
-
-### 3. **Test AI Chat Feature**
-
-```bash
-# Navigate to AI chat feature
-cd features/ai_chat
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
 
-# Run interactive demo
-python ai_chat_feature.py
+# Set up environment variables
+cp env.example .env
+# Edit .env with your API keys and configuration
 
-# Run tests
-python test_ai_chat.py
+# Start backend server
+python main.py
 ```
 
-### 4. **Backend Setup**
-
+### 3. Frontend Setup
 ```bash
-# Install Python dependencies
-pip install -r requirements.txt
+# Navigate to frontend
+cd frontend
 
-# Initialize database
-cd backend
-python -c "from app.core.database import create_tables; create_tables()"
+# Install dependencies
+npm install
 
-# Start FastAPI server
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+# Start development server
+npm start
 ```
 
-### 5. **Web Application**
+### 4. Access Platform
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:8000
+- **API Documentation**: http://localhost:8000/docs
 
-```bash
-# Start Streamlit app
-cd web_app
-streamlit run streamlit_app.py --server.port 8501
-```
+## 🛠️ Configuration
 
-### 6. **Mobile Application**
-
-```bash
-# Install Flutter dependencies
-cd mobile_app
-flutter pub get
-
-# Configure Firebase
-# Add google-services.json (Android) and GoogleService-Info.plist (iOS)
-
-# Run mobile app
-flutter run
-```
-
-### 7. **Docker Deployment**
-
-```bash
-# Build and start all services
-docker-compose up -d
-
-# View logs
-docker-compose logs -f
-
-# Stop services
-docker-compose down
-```
-
-## 📖 **Documentation**
-
-### API Documentation
-- **Swagger UI**: http://localhost:8000/docs
-- **ReDoc**: http://localhost:8000/redoc
-
-### Application URLs
-- **Web App**: http://localhost:8501
-- **API Backend**: http://localhost:8000
-- **Mobile App**: Use Flutter development environment
-
-### Feature Documentation
-- **AI Chat Feature**: [features/ai_chat/README.md](features/ai_chat/README.md)
-- **User Flow**: [docs/user-flow.md](docs/user-flow.md)
-- **Technology Stack**: [docs/tech-stack.md](docs/tech-stack.md)
-
-## 🔧 **Configuration**
-
-### Firebase Setup
-
-1. Create a Firebase project at https://console.firebase.google.com
-2. Enable Authentication with desired providers
-3. Create a service account and download credentials
-4. Add credentials to environment variables
-
-### OpenRouter Setup
-
-1. Sign up at https://openrouter.ai
-2. Get your API key from the dashboard
-3. Add the key to your environment variables
-
-### Database Configuration
-
-The application supports both SQLite (default) and PostgreSQL:
+### Environment Variables
+Create a `.env` file in the backend directory:
 
 ```env
-# SQLite (default)
-DATABASE_URL=sqlite:///./datasoph.db
+# API Configuration
+APP_NAME="DataSoph AI"
+APP_VERSION="2.0.0"
+DEBUG=true
 
-# PostgreSQL
-DATABASE_URL=postgresql://username:password@localhost/dbname
+# OpenRouter API (for AI capabilities)
+OPENROUTER_API_KEY=your_openrouter_api_key
+OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
+OPENROUTER_MODEL=anthropic/claude-3-sonnet
+
+# File Upload Settings
+MAX_FILE_SIZE_MB=100
+UPLOAD_DIRECTORY=./uploads
+
+# CORS Settings
+CORS_ORIGINS=["http://localhost:3000"]
+
+# Database (Optional - for production)
+DATABASE_URL=postgresql://user:password@localhost/datasoph_ai
 ```
 
-## 🧪 **Testing**
+### API Keys Setup
+1. **OpenRouter API**: Get your key from [OpenRouter.ai](https://openrouter.ai/)
+2. **Configure Model**: Choose from Claude, GPT-4, or other advanced models
+3. **Set Limits**: Configure rate limits and usage quotas
 
+## 📚 Usage Guide
+
+### 1. **Dashboard Overview**
+- Monitor project status and analytics
+- View recent activities and insights
+- Quick access to all platform features
+- Real-time performance metrics
+
+### 2. **Data Upload & Exploration**
+- Drag-and-drop file upload
+- Automatic data quality assessment
+- Interactive data preview
+- Smart preprocessing recommendations
+
+### 3. **AI-Powered Analysis**
+- Natural language queries to AI assistant
+- Automatic model selection and training
+- Statistical significance testing
+- Business insight generation
+
+### 4. **Interactive Coding**
+- Jupyter-style notebook interface
+- Multi-language support (Python, R, SQL)
+- Real-time code execution
+- Collaborative editing capabilities
+
+### 5. **Professional Reporting**
+- Executive-ready presentations
+- Customizable report templates
+- Multiple export formats (PDF, PowerPoint, HTML)
+- Automated insight summaries
+
+## 🏗️ Architecture
+
+### Frontend (React + TypeScript)
+```
+src/
+├── components/
+│   ├── Dashboard/           # Main dashboard and overview
+│   ├── ChatInterface/       # AI assistant interface
+│   ├── DataWorkspace/       # File management and exploration
+│   ├── AnalysisStudio/      # Statistical analysis and ML
+│   ├── CodeEnvironment/     # Interactive coding environment
+│   ├── ExportCenter/        # Professional reporting
+│   ├── Navigation/          # Sidebar and top navigation
+│   └── Layout/              # Common layouts and components
+├── hooks/                   # Custom React hooks
+├── services/                # API communication
+├── types/                   # TypeScript type definitions
+└── utils/                   # Utility functions
+```
+
+### Backend (FastAPI + Python)
+```
+backend/
+├── app/
+│   ├── core/                # Configuration and settings
+│   ├── services/            # Business logic services
+│   │   ├── ai_service.py    # AI and machine learning
+│   │   ├── data_quality_service.py  # Data quality assessment
+│   │   ├── ml_service.py    # Machine learning operations
+│   │   └── visualization_service.py # Chart generation
+│   ├── main.py              # FastAPI application
+│   └── uploads/             # File storage
+└── requirements.txt         # Python dependencies
+```
+
+## 🔧 Advanced Features
+
+### **AutoML Capabilities**
+- Automated feature selection and engineering
+- Model comparison and hyperparameter tuning
+- Cross-validation and performance metrics
+- Production deployment recommendations
+
+### **Real-time Analytics**
+- Live data connections and streaming
+- Real-time anomaly detection
+- Alert systems and notifications
+- Performance monitoring dashboards
+
+### **Collaboration Tools**
+- Project sharing and team collaboration
+- Version control for analyses
+- Comment and annotation systems
+- Access control and permissions
+
+### **Enterprise Integration**
+- REST API for external systems
+- Database connectors (PostgreSQL, MySQL, MongoDB)
+- Cloud storage integration (AWS S3, Google Drive)
+- SSO and enterprise authentication
+
+## 📊 Performance & Scalability
+
+### **Optimization Features**
+- Lazy loading and code splitting
+- Efficient data structures and algorithms
+- Memory management and garbage collection
+- Background processing for large datasets
+
+### **Scalability**
+- Horizontal scaling support
+- Container deployment (Docker/Kubernetes)
+- Load balancing and clustering
+- Cloud-native architecture
+
+## 🧪 Testing
+
+### Run Tests
 ```bash
-# Run AI chat feature tests
-cd features/ai_chat
-python test_ai_chat.py
+# Frontend tests
+cd frontend
+npm test
 
-# Run backend tests
+# Backend tests
 cd backend
-pytest tests/ -v
+python -m pytest
 
-# Run with coverage
-pytest tests/ --cov=app --cov-report=html
+# Integration tests
+python -m pytest tests/integration/
 
-# Test specific components
-pytest tests/test_auth.py -v
-pytest tests/test_rag.py -v
+# Performance tests
+python -m pytest tests/performance/
 ```
 
-## 📊 **Monitoring & Analytics**
+### Test Coverage
+- Unit tests for all components
+- Integration tests for API endpoints
+- End-to-end testing with Cypress
+- Performance and load testing
 
-### Health Checks
-- **API Health**: http://localhost:8000/health
-- **Database Status**: Monitored via health endpoint
-- **RAG System Status**: Real-time monitoring
+## 🚀 Deployment
 
-### Logging
-- Structured logging with Python logging
-- Log levels: DEBUG, INFO, WARNING, ERROR
-- Centralized log aggregation ready
-
-## 🚀 **Deployment**
-
-### Production Deployment
-
-1. **Environment Variables**: Set production environment variables
-2. **Database**: Use PostgreSQL for production
-3. **SSL/TLS**: Configure HTTPS certificates
-4. **Monitoring**: Set up monitoring and alerting
-5. **Backup**: Configure database backups
-
-### Kubernetes Deployment
-
+### **Development**
 ```bash
-# Apply Kubernetes configurations
-kubectl apply -f deployment/k8s/
-
-# Check deployment status
-kubectl get pods -n datasoph-ai
-
-# View logs
-kubectl logs -f deployment/datasoph-backend -n datasoph-ai
+# Start both frontend and backend
+npm run dev        # Frontend
+python main.py     # Backend
 ```
 
-### Cloud Deployment Options
+### **Production**
+```bash
+# Build frontend
+npm run build
 
-- **AWS**: ECS, EKS, or EC2 with RDS
-- **Google Cloud**: GKE with Cloud SQL
-- **Azure**: AKS with Azure Database
-- **Digital Ocean**: App Platform or Droplets
+# Deploy with Docker
+docker-compose up -d
 
-## 🤝 **Contributing**
+# Or deploy to cloud platforms
+# (AWS, Google Cloud, Azure, Vercel, Heroku)
+```
+
+### **Environment Specific**
+- Development: Local development with hot reload
+- Staging: Production-like environment for testing
+- Production: Optimized build with monitoring
+
+## 🤝 Contributing
 
 We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
 
-### Development Workflow
-
+### Development Setup
 1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/amazing-feature`
-3. Commit changes: `git commit -m 'Add amazing feature'`
-4. Push to branch: `git push origin feature/amazing-feature`
-5. Open a Pull Request
+2. Create a feature branch
+3. Make your changes
+4. Add tests for new features
+5. Submit a pull request
 
-### Code Standards
+### Code Style
+- Follow TypeScript/JavaScript best practices
+- Use Python PEP 8 guidelines
+- Write comprehensive tests
+- Document public APIs
 
-- **Python**: Follow PEP 8, use Black for formatting
-- **TypeScript**: Follow standard conventions, use Prettier
-- **Dart**: Follow Dart style guide, use dart format
-
-## 📄 **License**
+## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🆘 **Support**
+## 🆘 Support
 
-- **Documentation**: [docs.datasoph.ai](https://docs.datasoph.ai)
-- **Issues**: [GitHub Issues](https://github.com/yourusername/datasoph-ai/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/yourusername/datasoph-ai/discussions)
-- **Email**: support@datasoph.ai
+### **Documentation**
+- [User Guide](docs/user-guide.md)
+- [API Reference](docs/api-reference.md)
+- [Developer Docs](docs/developer-guide.md)
 
-## 🎯 **Roadmap**
+### **Community**
+- [Discord Community](https://discord.gg/datasoph)
+- [GitHub Discussions](https://github.com/datasoph/datasoph-ai/discussions)
+- [Stack Overflow](https://stackoverflow.com/questions/tagged/datasoph-ai)
 
-### Phase 1: Core Features ✅
-- [x] Authentication system
-- [x] RAG implementation
-- [x] LangChain agents
-- [x] Web application
-- [x] Mobile application
-- [x] **AI Chat Feature** ✅
+### **Professional Support**
+- Email: support@datasoph.ai
+- Enterprise: enterprise@datasoph.ai
+- Documentation: docs.datasoph.ai
 
-### Phase 2: Advanced Features 🚧
-- [ ] Advanced analytics dashboard
-- [ ] Multi-tenant architecture
-- [ ] Custom model fine-tuning
-- [ ] API marketplace integration
-- [ ] Real-time collaboration
+## 🌟 Acknowledgments
 
-### Phase 3: Enterprise Features 📅
-- [ ] Single Sign-On (SSO)
-- [ ] Advanced security features
-- [ ] Custom deployment options
-- [ ] Enterprise analytics
-- [ ] White-label solutions
-
-## 🏆 **Acknowledgments**
-
-- **LangChain** - For the excellent AI framework
-- **FastAPI** - For the high-performance web framework
-- **Streamlit** - For the beautiful web app framework
-- **Flutter** - For the cross-platform mobile framework
-- **OpenRouter** - For AI model access
-- **ChromaDB** - For the vector database
-
-## 📈 **Stats**
-
-- **Lines of Code**: 50,000+
-- **Files**: 100+
-- **Components**: 15+ major components
-- **Test Coverage**: 90%+
-- **Documentation**: Comprehensive
-- **Working Features**: 1 (AI Chat) ✅
+Built with ❤️ by the DataSoph team using:
+- React & TypeScript for the frontend
+- FastAPI & Python for the backend
+- Claude AI for intelligent assistance
+- Tailwind CSS for beautiful UI
+- Plotly & D3.js for visualizations
 
 ---
 
-<div align="center">
+**DataSoph.ai** - *Empowering Data Scientists with AI*
 
-**Built with ❤️ by the Datasoph AI Team**
-
-[Website](https://datasoph.ai) • [Documentation](https://docs.datasoph.ai) • [Twitter](https://twitter.com/datasoph_ai)
-
-</div> 
+[![Star on GitHub](https://img.shields.io/github/stars/datasoph/datasoph-ai.svg?style=social)](https://github.com/datasoph/datasoph-ai/stargazers)
+[![Follow on Twitter](https://img.shields.io/twitter/follow/datasoph_ai.svg?style=social)](https://twitter.com/datasoph_ai) 

@@ -1,0 +1,276 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* Claude's exact typography with Inter font family */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+/* Claude's exact base styles */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 16px;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  line-height: 1.5;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Claude's Exact Light Mode Colors */
+:root {
+  /* Backgrounds */
+  --bg-main: #ffffff;                    /* Pure white main area */
+  --bg-sidebar: #f8f9fa;                /* Light gray sidebar */
+  --bg-hover: #f6f8fa;                  /* Hover states */
+  --bg-input: #ffffff;                  /* Input background */
+  
+  /* Text Colors */
+  --text-primary: #1f2328;              /* Main text (dark gray) */
+  --text-secondary: #656d76;            /* Secondary text (medium gray) */
+  --text-tertiary: #8c959f;             /* Tertiary text (light gray) */
+  --text-placeholder: #8c959f;          /* Placeholder text */
+  
+  /* Borders */
+  --border-light: #d0d7de;              /* Light borders */
+  --border-medium: #d1d9e0;             /* Medium borders */
+  --border-focus: #0969da;              /* Focus border (blue) */
+  
+  /* Avatars & Accents */
+  --avatar-user: #0969da;               /* User avatar (blue) */
+  --avatar-ai: #f97316;                 /* AI avatar (orange) */
+  --accent-orange: #f97316;             /* Claude orange */
+  
+  /* Buttons */
+  --btn-primary: #f6f8fa;               /* Button background */
+  --btn-primary-hover: #f1f3f4;         /* Button hover */
+  --btn-text: #24292f;                  /* Button text */
+}
+
+/* Claude's Exact Dark Mode Colors */
+[data-theme="dark"] {
+  /* Backgrounds */
+  --bg-main: #0d1117;                   /* Dark main area */
+  --bg-sidebar: #161b22;                /* Dark sidebar */
+  --bg-hover: #21262d;                  /* Dark hover */
+  --bg-input: #0d1117;                  /* Dark input */
+  
+  /* Text Colors */
+  --text-primary: #f0f6fc;              /* Light text */
+  --text-secondary: #8b949e;            /* Secondary light text */
+  --text-tertiary: #6e7681;             /* Tertiary light text */
+  --text-placeholder: #7d8590;          /* Placeholder light text */
+  
+  /* Borders */
+  --border-light: #30363d;              /* Dark borders */
+  --border-medium: #21262d;             /* Medium dark borders */
+  --border-focus: #2188ff;              /* Focus border (lighter blue) */
+  
+  /* Avatars stay same in dark mode */
+  --avatar-user: #2188ff;               /* User avatar (lighter blue) */
+  --avatar-ai: #f97316;                 /* AI avatar (same orange) */
+  
+  /* Buttons */
+  --btn-primary: #21262d;               /* Dark button background */
+  --btn-primary-hover: #30363d;         /* Dark button hover */
+  --btn-text: #f0f6fc;                  /* Light button text */
+}
+
+/* Apply theme colors to body */
+body {
+  background-color: var(--bg-main);
+  color: var(--text-primary); 
+}
+
+/* Claude's exact scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-main);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-light);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-tertiary);
+}
+
+/* Smooth transitions - Claude match */
+.transition-colors {
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+}
+
+/* Focus states - Claude match */
+.focus\:ring-2:focus {
+  --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+  box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+}
+
+/* Prose styling for messages */
+.prose {
+  max-width: none;
+  color: var(--text-primary);
+  line-height: 1.7;
+}
+
+.prose p {
+  margin-bottom: 1.25em;
+}
+
+.prose p:last-child {
+  margin-bottom: 0;
+}
+
+.prose strong {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.prose em {
+  font-style: italic;
+  color: var(--text-secondary);
+}
+
+.prose code {
+  background-color: var(--bg-hover);
+  color: var(--text-primary);
+  padding: 0.125rem 0.375rem;
+  border-radius: 0.25rem;
+  font-size: 0.875em;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', 'Source Code Pro', monospace;
+}
+
+.prose pre {
+  background-color: var(--bg-hover);
+  border: 1px solid var(--border-light);
+  color: var(--text-primary);
+  padding: 1.25rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.prose pre code {
+  background-color: transparent;
+  padding: 0;
+  border-radius: 0;
+  color: inherit;
+  font-size: inherit;
+}
+
+.prose ul,
+.prose ol {
+  margin: 1.25rem 0;
+  padding-left: 1.625rem;
+}
+
+.prose li {
+  margin: 0.5rem 0;
+}
+
+.prose blockquote {
+  border-left: 4px solid var(--border-light);
+  padding-left: 1rem;
+  margin: 1.5rem 0;
+  font-style: italic;
+  color: var(--text-secondary);
+}
+
+/* DataSoph Logo Animations - Clean and Simple */
+@keyframes datasoph-spin {
+  0% { 
+    transform: rotate(0deg);
+  }
+  100% { 
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes datasoph-thinking {
+  0% { 
+    transform: rotate(0deg);
+    opacity: 0.8;
+  }
+  50% { 
+    opacity: 1;
+  }
+  100% { 
+    transform: rotate(360deg);
+    opacity: 0.8;
+  }
+}
+
+.datasoph-spin {
+  animation: datasoph-spin 1s linear infinite;
+}
+
+.datasoph-thinking {
+  animation: datasoph-thinking 2s ease-in-out infinite;
+}
+
+.datasoph-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Bounce animation for typing indicator */
+@keyframes bounce {
+  0%, 20%, 53%, 80%, 100% {
+    transform: translate3d(0,0,0);
+  }
+  40%, 43% {
+    transform: translate3d(0, -4px, 0);
+  }
+  70% {
+    transform: translate3d(0, -2px, 0);
+  }
+  90% {
+    transform: translate3d(0, -1px, 0);
+  }
+}
+
+.animate-bounce {
+  animation: bounce 1.4s ease-in-out infinite both;
+}
+
+/* Claude's exact responsive design */
+@media (max-width: 1024px) {
+  .claude-sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .claude-sidebar.open {
+    transform: translateX(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .claude-chat-container {
+    padding: 0.5rem 0.75rem;
+  }
+  
+  .claude-message-avatar {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+  
+  .claude-message-content {
+    font-size: 0.875rem;
+  }
+} 
