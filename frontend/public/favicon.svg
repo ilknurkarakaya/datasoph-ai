@@ -1,19 +1,30 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Main spiral - thick like page logos -->
   <path
-    d="M 50 15 
-       C 75 15, 85 25, 85 50
-       C 85 75, 75 85, 50 85
-       C 25 85, 15 75, 15 50
-       C 15 30, 25 20, 40 20
-       C 60 20, 70 30, 70 50
-       C 70 65, 60 75, 45 75
-       C 35 75, 28 68, 28 58
-       C 28 48, 35 43, 42 43
-       C 47 43, 50 46, 50 50
-       C 50 52, 49 53, 48 53"
-    stroke="#fbbf24"
-    strokeWidth="6"
-    fill="none"
+    d="M16 3 C23 3, 29 7, 29 16 C29 25, 23 29, 16 29 C9 29, 3 25, 3 16 C3 9, 7 5, 13 5 C18 5, 22 9, 22 14 C22 19, 18 23, 13 23 C11 23, 9 21, 9 19 C9 18, 10 17, 11 17"
+    stroke="#ffde59"
+    strokeWidth="4"
     strokeLinecap="round"
+    fill="none"
+  />
+  
+  <!-- Inner spiral for depth - like page logos -->
+  <path
+    d="M16 5 C21 5, 27 9, 27 16 C27 23, 21 27, 16 27 C11 27, 5 23, 5 16 C5 11, 9 7, 13 7 C17 7, 21 11, 21 15 C21 17, 19 19, 17 19"
+    stroke="#ffde59"
+    strokeWidth="2.5"
+    strokeLinecap="round"
+    fill="none"
+    opacity="0.7"
+  />
+  
+  <!-- Innermost detail -->
+  <path
+    d="M16 7 C19 7, 25 11, 25 16 C25 21, 19 25, 16 25 C13 25, 7 21, 7 16 C7 13, 11 9, 14 9 C16 9, 18 11, 18 13"
+    stroke="#ffde59"
+    strokeWidth="1.5"
+    strokeLinecap="round"
+    fill="none"
+    opacity="0.6"
   />
 </svg> 

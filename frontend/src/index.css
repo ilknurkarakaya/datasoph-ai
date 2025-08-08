@@ -18,10 +18,10 @@
   
   /* Claude's Exact Light Mode Colors */
   /* Backgrounds */
-  --bg-main: #ffffff;                    /* Pure white main area */
-  --bg-sidebar: #f8f9fa;                /* Light gray sidebar */
-  --bg-hover: #f6f8fa;                  /* Hover states */
-  --bg-input: #ffffff;                  /* Input background */
+  --bg-main: #f9f6f1;                    /* Warm cream main area */
+  --bg-sidebar: #f5f2eb;                 /* One shade lighter sidebar */
+  --bg-hover: #ebe8e1;                   /* Hover states */
+  --bg-input: #f9f6f1;                   /* Input background - same as main */
   
   /* Text Colors */
   --text-primary: #1f2328;              /* Main text (dark gray) */
@@ -32,7 +32,7 @@
   /* Borders */
   --border-light: #d0d7de;              /* Light borders */
   --border-medium: #d1d9e0;             /* Medium borders */
-  --border-focus: #0969da;              /* Focus border (blue) */
+  --border-focus: #d0d7de;              /* Focus border - same as normal */
   
   /* Avatars & Accents */
   --avatar-user: #0969da;               /* User avatar (blue) */
@@ -48,10 +48,10 @@
 /* Claude's Exact Dark Mode Colors */
 [data-theme="dark"] {
   /* Backgrounds */
-  --bg-main: #0d1117;                   /* Dark main area */
-  --bg-sidebar: #161b22;                /* Dark sidebar */
-  --bg-hover: #21262d;                  /* Dark hover */
-  --bg-input: #0d1117;                  /* Dark input */
+  --bg-main: #2a2a2a;                    /* Dark gray main area */
+  --bg-sidebar: #1e1e1e;                /* Darker sidebar */
+  --bg-hover: #3a3a3a;                  /* Hover states */
+  --bg-input: #2a2a2a;                  /* Input background */
   
   /* Text Colors */
   --text-primary: #f0f6fc;              /* Light text */
@@ -61,8 +61,8 @@
   
   /* Borders */
   --border-light: #30363d;              /* Dark borders */
-  --border-medium: #21262d;             /* Medium dark borders */
-  --border-focus: #2188ff;              /* Focus border (lighter blue) */
+  --border-medium: #373e47;             /* Medium borders */
+  --border-focus: #30363d;              /* Focus border - same as normal */
   
   /* Avatars stay same in dark mode */
   --avatar-user: #2188ff;               /* User avatar (lighter blue) */

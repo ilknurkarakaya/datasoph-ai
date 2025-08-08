@@ -23,7 +23,7 @@ const WelcomeLayout: React.FC<WelcomeLayoutProps> = ({
             <DataSophLogo 
               size={64} 
               className="drop-shadow-sm" 
-              color="#f97316"
+              color="#ffde59"
             />
           </div>
         </div>

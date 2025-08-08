@@ -32,7 +32,7 @@ const TypingIndicator: React.FC<TypingIndicatorProps> = ({ stage = 'thinking' })
       <div className="w-8 h-8 flex items-center justify-center">
         <DataSophLogo 
           size={24} 
-          color="#f97316"
+          color="#ffde59"
           className={getAnimationClass()}
         />
       </div>

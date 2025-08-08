@@ -36,7 +36,7 @@ const ClaudeSidebar: React.FC = () => {
       {/* Top Section - DataSoph Logo and Brand */}
       <div className="px-3 py-4 border-b border-[var(--border-light)]">
         <div className="flex items-center gap-3 px-0">
-          <DataSophLogo size={28} color="#f97316" />
+          <DataSophLogo size={28} color="#ffde59" />
           <span className="text-base font-medium text-[var(--text-primary)] font-system">DataSoph.ai</span>
         </div>
       </div>
@@ -45,12 +45,12 @@ const ClaudeSidebar: React.FC = () => {
       <div className="p-3">
         <button 
           onClick={handleNewChat}
-          className="w-full flex items-center gap-3 px-3 py-2 bg-[var(--btn-primary)] hover:bg-[var(--btn-primary-hover)] border border-[var(--border-light)] rounded-md transition-colors group"
+          className="w-full flex items-center gap-3 px-0 py-2 hover:bg-[var(--bg-hover)] rounded-md transition-colors group text-left"
         >
           <svg className="w-4 h-4 text-[var(--text-secondary)] group-hover:text-[var(--text-primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
-          <span className="text-sm font-medium text-[var(--btn-text)] font-system">New chat</span>
+          <span className="text-sm font-medium text-[var(--text-primary)] font-system">New chat</span>
         </button>
       </div>
       
@@ -65,8 +65,8 @@ const ClaudeSidebar: React.FC = () => {
       {/* User Profile Section */}
       <div className="p-3 border-t border-[var(--border-light)]">
         <div className="flex items-center gap-3 px-3 py-2">
-          <div className="w-7 h-7 bg-[var(--avatar-user)] rounded-full flex items-center justify-center">
-            <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+          <div className="w-7 h-7 bg-[var(--bg-hover)] rounded-full flex items-center justify-center">
+            <svg className="w-4 h-4 text-[var(--text-secondary)]" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
             </svg>
           </div>
@@ -83,7 +83,7 @@ const ClaudeSidebar: React.FC = () => {
           >
             {darkMode ? (
               <svg className="w-4 h-4 text-[var(--text-secondary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707M16.95 7.05a7 7 0 101.414 1.414l-.707.707A8 8 0 1112 4.001V3z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
               </svg>
             ) : (
               <svg className="w-4 h-4 text-[var(--text-secondary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
