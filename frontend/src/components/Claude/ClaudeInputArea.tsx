@@ -90,27 +90,17 @@ const ClaudeInputArea: React.FC<ClaudeInputAreaProps> = ({
       >
         {/* Drag & Drop Overlay */}
         {isDragging && (
-          <div className={`absolute inset-0 z-10 rounded-xl transition-all duration-300 ease-out flex items-center justify-center backdrop-blur-sm ${
+          <div className={`absolute inset-0 z-10 rounded-xl transition-all duration-200 flex items-center justify-center ${
             isOver 
-              ? 'bg-[var(--bg-main)]/95 border border-dashed border-blue-400/60' 
-              : 'bg-[var(--bg-main)]/90 border border-dashed border-[var(--border-light)]/60'
+              ? 'bg-blue-500/10 border border-blue-400' 
+              : 'bg-gray-100/50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600'
           }`}>
-            <div className="flex items-center gap-1.5 px-2 py-0.5">
-              <div className={`w-4 h-4 rounded-full flex items-center justify-center transition-all duration-300 ${
-                isOver 
-                  ? 'bg-blue-50 dark:bg-blue-900/20' 
-                  : 'bg-[var(--bg-hover)]'
-              }`}>
-                <svg className={`w-2.5 h-2.5 transition-colors duration-300 ${
-                  isOver ? 'text-blue-500' : 'text-[var(--text-secondary)]'
-                }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 12l3 3m0 0l3-3m-3 3V9" />
-                </svg>
-              </div>
-              <span className={`text-xs transition-colors duration-300 ${
-                isOver ? 'text-blue-600 dark:text-blue-400' : 'text-[var(--text-secondary)]'
-              }`}>
-                {isOver ? 'Bırak' : 'Dosya'}
+            <div className="flex items-center gap-1 px-2 py-1 bg-white/90 dark:bg-gray-900/90 rounded-md shadow-sm">
+              <svg className={`w-3 h-3 ${isOver ? 'text-blue-500' : 'text-gray-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 12l3 3m0 0l3-3m-3 3V9" />
+              </svg>
+              <span className={`text-xs ${isOver ? 'text-blue-600' : 'text-gray-600'}`}>
+                {isOver ? 'Bırak' : 'Sürükle'}
               </span>
             </div>
           </div>
