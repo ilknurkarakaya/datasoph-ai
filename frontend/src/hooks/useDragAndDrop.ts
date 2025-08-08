@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef } from 'react';
 
+// v5.0 - Force sidebar colors for drag & drop overlay
 export const useDragAndDrop = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [isOver, setIsOver] = useState(false);

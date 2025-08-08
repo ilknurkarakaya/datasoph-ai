@@ -90,18 +90,15 @@ const ClaudeInputArea: React.FC<ClaudeInputAreaProps> = ({
       >
         {/* Drag & Drop Overlay */}
         {isDragging && (
-          <div className={`absolute inset-0 z-10 rounded-xl transition-all duration-200 flex items-center justify-center ${
-            isOver 
-              ? 'bg-blue-500/10 border border-blue-400' 
-              : 'bg-gray-100/50 dark:bg-gray-800/50 border border-gray-300 dark:border-gray-600'
-          }`}>
-            <div className="flex items-center gap-1 px-2 py-1 bg-white/90 dark:bg-gray-900/90 rounded-md shadow-sm">
-              <svg className={`w-3 h-3 ${isOver ? 'text-blue-500' : 'text-gray-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 12l3 3m0 0l3-3m-3 3V9" />
-              </svg>
-              <span className={`text-xs ${isOver ? 'text-blue-600' : 'text-gray-600'}`}>
-                {isOver ? 'Bırak' : 'Sürükle'}
-              </span>
+                  <div style={{
+          backgroundColor: isOver 
+            ? 'var(--bg-hover)' 
+            : 'var(--bg-sidebar)',
+          opacity: isOver ? 0.95 : 0.90,
+          border: isOver ? '2px solid var(--border-medium)' : '1px solid var(--border-light)'
+        }} className="absolute inset-0 z-10 rounded-xl flex items-center justify-center transition-colors duration-200">
+            <div className="px-2 py-1 text-xs text-[#656d76] dark:text-[#8b949e] font-medium">
+              {isOver ? 'Drop files here' : 'Drag files here'} {/* v6.0 - CSS Variables */}
             </div>
           </div>
         )}
@@ -136,7 +133,7 @@ const ClaudeInputArea: React.FC<ClaudeInputAreaProps> = ({
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyPress}
-            placeholder="Message DataSoph.ai..."
+            placeholder="Ask like you're working with a data scientist..."
             className="w-full resize-none border-0 bg-transparent text-base text-[var(--text-primary)] placeholder-[var(--text-placeholder)] focus:outline-none font-system"
             rows={1}
             style={{ minHeight: '24px', maxHeight: '120px' }}

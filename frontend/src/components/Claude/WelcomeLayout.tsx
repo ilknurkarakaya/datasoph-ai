@@ -30,12 +30,10 @@ const WelcomeLayout: React.FC<WelcomeLayoutProps> = ({
         
         {/* Welcome Text */}
         <h1 className="text-3xl font-medium text-[var(--text-primary)] mb-4 font-system">
-          How can I help you today?
+          How can I help you today? {/* Updated v5.0 */}
         </h1>
 
-        <p className="text-lg text-[var(--text-secondary)] leading-relaxed font-system">
-          I'm DataSoph.ai, your professional data science assistant. Upload a dataset or ask me any data-related question to get started.
-        </p>
+
       </div>
 
       {/* Centered Input */}
@@ -44,7 +42,7 @@ const WelcomeLayout: React.FC<WelcomeLayoutProps> = ({
           inputValue={inputValue}
           setInputValue={setInputValue}
           onSendMessage={onSendMessage}
-          placeholder="Ask DataSoph AI anything about data science..."
+          placeholder="Ask like you're working with a data scientist..."
         />
       </div>
     </div>

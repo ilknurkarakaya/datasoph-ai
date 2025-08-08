@@ -238,21 +238,21 @@ What specific statistical question or hypothesis would you like to investigate?`
         setIsTyping(false);
       } else {
         // Use the existing mock response for regular chat
-        setTimeout(() => {
-          const aiMessage: Message = {
-            id: Date.now() + 1,
-            type: 'assistant',
-            content: generateAIResponse(message),
-            timestamp: new Date().toLocaleTimeString('en-US', { 
-              hour: 'numeric', 
-              minute: '2-digit',
-              hour12: true 
-            })
-          };
-          
-          setMessages(prev => [...prev, aiMessage]);
-          setIsTyping(false);
-        }, 3200);
+    setTimeout(() => {
+      const aiMessage: Message = {
+        id: Date.now() + 1,
+        type: 'assistant',
+        content: generateAIResponse(message),
+        timestamp: new Date().toLocaleTimeString('en-US', { 
+          hour: 'numeric', 
+          minute: '2-digit',
+          hour12: true 
+        })
+      };
+      
+      setMessages(prev => [...prev, aiMessage]);
+      setIsTyping(false);
+    }, 3200);
       }
     } catch (error) {
       console.error('Chat error:', error);

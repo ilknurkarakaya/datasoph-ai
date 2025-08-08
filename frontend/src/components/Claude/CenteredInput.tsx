@@ -105,33 +105,15 @@ const CenteredInput: React.FC<CenteredInputProps> = ({
       >
         {/* Drag & Drop Overlay */}
         {isDragging && (
-          <div className={`absolute inset-0 z-10 rounded-2xl transition-all duration-300 ease-out flex items-center justify-center backdrop-blur-sm ${
-            isOver 
-              ? 'bg-[var(--bg-main)]/95 border-2 border-dashed border-[#ffde59]/70' 
-              : 'bg-[var(--bg-main)]/90 border-2 border-dashed border-[var(--border-light)]'
-          }`}>
-            <div className="text-center px-6 py-4">
-              <div className={`w-12 h-12 mx-auto mb-3 rounded-full flex items-center justify-center transition-all duration-300 ${
-                isOver 
-                  ? 'bg-[#ffde59]/15 scale-105' 
-                  : 'bg-[var(--bg-hover)] scale-100'
-              }`}>
-                <svg className={`w-6 h-6 transition-colors duration-300 ${
-                  isOver ? 'text-[#ffde59]' : 'text-[var(--text-secondary)]'
-                }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 12l3 3m0 0l3-3m-3 3V9" />
-                </svg>
-              </div>
-              <h3 className={`text-base font-medium mb-1 transition-colors duration-300 font-system ${
-                isOver ? 'text-[#ffde59]' : 'text-[var(--text-primary)]'
-              }`}>
-                {isOver ? 'Dosyayı bırak' : 'Dosya yükle'}
-              </h3>
-              <p className="text-sm text-[var(--text-secondary)] font-system">
-                {isOver 
-                  ? 'AI analizi başlayacak' 
-                  : 'CSV, Excel, JSON desteklenir'}
-              </p>
+                  <div style={{
+          backgroundColor: isOver 
+            ? 'var(--bg-hover)' 
+            : 'var(--bg-sidebar)',
+          opacity: isOver ? 0.95 : 0.90,
+          border: isOver ? '2px solid var(--border-medium)' : '1px solid var(--border-light)'
+        }} className="absolute inset-0 z-10 rounded-2xl flex items-center justify-center transition-colors duration-200">
+            <div className="px-3 py-2 text-sm text-[#656d76] dark:text-[#8b949e] font-medium">
+              {isOver ? 'Drop files here' : 'Drag files here'}
             </div>
           </div>
         )}
