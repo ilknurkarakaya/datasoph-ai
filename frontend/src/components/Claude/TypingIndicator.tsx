@@ -40,8 +40,7 @@ const TypingIndicator: React.FC<TypingIndicatorProps> = ({ stage = 'thinking' })
       {/* Message Content */}
       <div className="flex-1">
         <div className="flex items-center gap-2 mb-1">
-          <span className="text-sm font-medium text-[var(--text-primary)]">DataSoph AI</span>
-          <span className="text-xs text-[var(--text-tertiary)]">{getTypingMessage()}</span>
+          <span className="text-sm font-medium text-[var(--text-primary)] font-system">DataSoph.ai</span>
         </div>
       </div>
     </div>

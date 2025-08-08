@@ -342,6 +342,16 @@ Built with ❤️ by the DataSoph team using:
 - Tailwind CSS for beautiful UI
 - Plotly & D3.js for visualizations
 
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+### What this means:
+- ✅ **Free to use** for personal and commercial projects
+- ✅ **Modify and distribute** the code
+- ✅ **No warranty** - use at your own risk
+- ✅ **Attribution required** - keep copyright notice
+
 ---
 
 **DataSoph.ai** - *Empowering Data Scientists with AI*

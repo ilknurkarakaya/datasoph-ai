@@ -1,31 +1,22 @@
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-/* Claude's exact typography with Inter font family */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-
-/* Claude's exact base styles */
-* {
-  box-sizing: border-box;
-}
-
-html {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  font-size: 16px;
-}
-
-body {
-  margin: 0;
-  padding: 0;
-  line-height: 1.5;
-  transition: background-color 0.2s ease, color 0.2s ease;
-}
-
-/* Claude's Exact Light Mode Colors */
+/* Claude's Exact Font System */
 :root {
+  --font-system: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+  
+  /* Claude's Font Sizes */
+  --text-xs: 12px;     /* timestamps, footer */
+  --text-sm: 14px;     /* sidebar items, usernames, code */
+  --text-base: 16px;   /* main text, input */
+  --text-lg: 18px;     /* large text */
+  --text-xl: 20px;     /* h3 headers */
+  --text-2xl: 24px;    /* h2 subtitles */
+  --text-3xl: 28px;    /* h1 main titles */
+  
+  /* Claude's Exact Light Mode Colors */
   /* Backgrounds */
   --bg-main: #ffffff;                    /* Pure white main area */
   --bg-sidebar: #f8f9fa;                /* Light gray sidebar */
@@ -80,7 +71,38 @@ body {
   /* Buttons */
   --btn-primary: #21262d;               /* Dark button background */
   --btn-primary-hover: #30363d;         /* Dark button hover */
-  --btn-text: #f0f6fc;                  /* Light button text */
+  --btn-text: #e6edf3;                  /* Button text */
+}
+
+/* Claude's Exact Base Styles */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-family: var(--font-system);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: var(--text-base);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-system);
+  font-size: var(--text-base);
+  line-height: 1.5;
+  font-weight: 400;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Font Family Utilities */
+.font-system {
+  font-family: var(--font-system);
+}
+
+.font-mono {
+  font-family: var(--font-mono);
 }
 
 /* Apply theme colors to body */

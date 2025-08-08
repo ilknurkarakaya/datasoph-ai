@@ -59,15 +59,12 @@ const ClaudeInputArea: React.FC<ClaudeInputAreaProps> = ({
           <textarea
             ref={textareaRef}
             value={inputValue}
-            onChange={handleInputChange}
+            onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyPress}
-            placeholder="Message DataSoph AI..."
+            placeholder="Message DataSoph.ai..."
+            className="w-full resize-none border-0 bg-transparent text-base text-[var(--text-primary)] placeholder-[var(--text-placeholder)] focus:outline-none font-system"
             rows={1}
-            className="w-full resize-none border border-[var(--border-light)] rounded-lg px-3 py-3 pr-12 text-sm text-[var(--text-primary)] bg-[var(--bg-input)] placeholder-[var(--text-placeholder)] focus:outline-none focus:ring-2 focus:ring-[var(--border-focus)] focus:border-[var(--border-focus)] transition-colors"
-            style={{
-              minHeight: '44px',
-              maxHeight: '200px'
-            }}
+            style={{ minHeight: '24px', maxHeight: '120px' }}
           />
           
           {/* Send Button */}

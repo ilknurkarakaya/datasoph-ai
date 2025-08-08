@@ -3,11 +3,27 @@ module.exports = {
   content: [
     "./src/**/*.{js,jsx,ts,tsx}",
   ],
-  darkMode: 'class', // Enable class-based dark mode
+  darkMode: 'class',
   theme: {
     extend: {
       fontFamily: {
-        'sans': ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        'system': ['-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif'],
+        'mono': ['"SF Mono"', 'Monaco', '"Cascadia Code"', '"Roboto Mono"', 'Consolas', '"Courier New"', 'monospace'],
+      },
+      fontSize: {
+        'xs': ['12px', '1.4'], // timestamps, footer
+        'sm': ['14px', '1.4'], // sidebar items, usernames, code
+        'base': ['16px', '1.5'], // main text, input
+        'lg': ['18px', '1.5'], // large text
+        'xl': ['20px', '1.5'], // h3 headers
+        '2xl': ['24px', '1.4'], // h2 subtitles
+        '3xl': ['28px', '1.3'], // h1 main titles
+      },
+      fontWeight: {
+        'normal': '400',
+        'medium': '500',
+        'semibold': '600',
+        'bold': '700',
       },
       colors: {
         // Claude's exact color palette for both light and dark modes
@@ -100,23 +116,6 @@ module.exports = {
       maxWidth: {
         'claude': '48rem',
         '8xl': '88rem',
-      },
-      fontSize: {
-        'xs': ['0.75rem', { lineHeight: '1.4' }],
-        'sm': ['0.875rem', { lineHeight: '1.5' }],
-        'base': ['1rem', { lineHeight: '1.6' }],
-        'lg': ['1.125rem', { lineHeight: '1.6' }],
-        'xl': ['1.25rem', { lineHeight: '1.4' }],
-        '2xl': ['1.5rem', { lineHeight: '1.3' }],
-        '3xl': ['1.875rem', { lineHeight: '1.2' }],
-      },
-      fontWeight: {
-        '300': '300',
-        '400': '400',
-        '500': '500',
-        '600': '600',
-        '700': '700',
-        '800': '800',
       },
       borderRadius: {
         'lg': '0.75rem',

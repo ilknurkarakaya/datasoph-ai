@@ -29,12 +29,12 @@ const WelcomeLayout: React.FC<WelcomeLayoutProps> = ({
         </div>
         
         {/* Welcome Text */}
-        <h1 className="text-3xl sm:text-4xl font-semibold text-[var(--text-primary)] mb-4">
+        <h1 className="text-3xl font-medium text-[var(--text-primary)] mb-4 font-system">
           How can I help you today?
         </h1>
-        
-        <p className="text-lg sm:text-xl text-[var(--text-secondary)] leading-relaxed">
-          I'm DataSoph AI, your professional data science assistant. Upload a dataset or ask me any data-related question to get started.
+
+        <p className="text-lg text-[var(--text-secondary)] leading-relaxed font-system">
+          I'm DataSoph.ai, your professional data science assistant. Upload a dataset or ask me any data-related question to get started.
         </p>
       </div>
 

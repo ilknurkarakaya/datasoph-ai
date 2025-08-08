@@ -206,15 +206,17 @@ function SidebarProvider({ children }: { children: React.ReactNode }) {
 // Main DataSoph App - Exact Claude Layout with Collapsible Sidebar
 function DataSophApp() {
   return (
-    <DarkModeProvider>
-      <UserProvider>
-        <ChatProvider>
-          <SidebarProvider>
-            <AppContent />
-          </SidebarProvider>
-        </ChatProvider>
-      </UserProvider>
-    </DarkModeProvider>
+    <div className="DataSoph-app font-system">
+      <DarkModeProvider>
+        <UserProvider>
+          <ChatProvider>
+            <SidebarProvider>
+              <AppContent />
+            </SidebarProvider>
+          </ChatProvider>
+        </UserProvider>
+      </DarkModeProvider>
+    </div>
   );
 }
 

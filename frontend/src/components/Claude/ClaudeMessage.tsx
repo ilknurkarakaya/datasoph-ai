@@ -37,16 +37,16 @@ const ClaudeMessage: React.FC<ClaudeMessageProps> = ({ message }) => {
       <div className="flex-1 min-w-0">
         {/* Header */}
         <div className="flex items-center gap-2 mb-1">
-          <span className="text-sm font-medium text-[var(--text-primary)]">
-            {isUser ? 'You' : 'DataSoph AI'}
+          <span className="text-sm font-medium text-[var(--text-primary)] font-system">
+            {isUser ? 'You' : 'DataSoph.ai'}
           </span>
-          <span className="text-xs text-[var(--text-tertiary)]">
+          <span className="text-xs text-[var(--text-tertiary)] font-system">
             {message.timestamp}
           </span>
         </div>
-        
+
         {/* Content */}
-        <div className="prose prose-sm max-w-none text-[var(--text-primary)] prose-headings:text-[var(--text-primary)] prose-p:text-[var(--text-primary)] prose-code:text-[var(--text-primary)]">
+        <div className="text-base text-[var(--text-primary)] leading-relaxed font-system">
           <MessageContent content={message.content} />
         </div>
       </div>
