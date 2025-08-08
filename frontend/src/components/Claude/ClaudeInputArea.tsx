@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import { useFileUpload } from '../../hooks/useFileUpload';
+import { useDragAndDrop } from '../../hooks/useDragAndDrop';
 
 interface ClaudeInputAreaProps {
   inputValue: string;
@@ -18,7 +19,15 @@ const ClaudeInputArea: React.FC<ClaudeInputAreaProps> = ({
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { uploadFile, isUploading, uploadError } = useFileUpload();
+  const { uploadFile, isUploading, uploadError, validateFile } = useFileUpload();
+  const { 
+    isDragging, 
+    isOver, 
+    handleDragEnter, 
+    handleDragLeave, 
+    handleDragOver, 
+    handleDrop 
+  } = useDragAndDrop();
   
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -44,20 +53,69 @@ const ClaudeInputArea: React.FC<ClaudeInputAreaProps> = ({
     // Reset input value to allow uploading the same file again
     e.target.value = '';
   };
-  
-  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setInputValue(e.target.value);
-    
-    // Auto-resize textarea
-    const textarea = e.target;
-    textarea.style.height = 'auto';
-    textarea.style.height = Math.min(textarea.scrollHeight, 200) + 'px';
+
+  const handleFilesDropped = async (files: File[]) => {
+    if (files.length > 0) {
+      const file = files[0]; // Handle first file
+      
+      // Validate file before uploading
+      const validationError = validateFile(file);
+      if (validationError) {
+        console.error('File validation error:', validationError);
+        return;
+      }
+
+      try {
+        const uploadedFile = await uploadFile(file);
+        if (uploadedFile && onFileUploaded) {
+          // Automatically trigger AI analysis with a standard message
+          onFileUploaded(uploadedFile.id, uploadedFile.name);
+        }
+      } catch (error) {
+        console.error('File drop upload error:', error);
+      }
+    }
   };
   
   return (
     <div className="relative">
-      {/* Input Container */}
-      <div className="flex items-end gap-2">
+      {/* Input Container with Drag & Drop */}
+      <div 
+        data-drop-zone="true"
+        className="flex items-end gap-2 relative"
+        onDragEnter={handleDragEnter}
+        onDragLeave={handleDragLeave}
+        onDragOver={handleDragOver}
+        onDrop={(e) => handleDrop(e, handleFilesDropped)}
+      >
+        {/* Drag & Drop Overlay */}
+        {isDragging && (
+          <div className={`absolute inset-0 z-10 rounded-xl transition-all duration-300 ease-out flex items-center justify-center backdrop-blur-sm ${
+            isOver 
+              ? 'bg-[var(--bg-main)]/95 border border-dashed border-blue-400/60' 
+              : 'bg-[var(--bg-main)]/90 border border-dashed border-[var(--border-light)]/60'
+          }`}>
+            <div className="flex items-center gap-1.5 px-2 py-0.5">
+              <div className={`w-4 h-4 rounded-full flex items-center justify-center transition-all duration-300 ${
+                isOver 
+                  ? 'bg-blue-50 dark:bg-blue-900/20' 
+                  : 'bg-[var(--bg-hover)]'
+              }`}>
+                <svg className={`w-2.5 h-2.5 transition-colors duration-300 ${
+                  isOver ? 'text-blue-500' : 'text-[var(--text-secondary)]'
+                }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 12l3 3m0 0l3-3m-3 3V9" />
+                </svg>
+              </div>
+              <span className={`text-xs transition-colors duration-300 ${
+                isOver ? 'text-blue-600 dark:text-blue-400' : 'text-[var(--text-secondary)]'
+              }`}>
+                {isOver ? 'Bırak' : 'Dosya'}
+              </span>
+            </div>
+          </div>
+        )}
+
         {/* File Upload Button */}
         <button 
           onClick={() => fileInputRef.current?.click()}

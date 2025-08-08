@@ -205,6 +205,39 @@ function SidebarProvider({ children }: { children: React.ReactNode }) {
 
 // Main DataSoph App - Exact Claude Layout with Collapsible Sidebar
 function DataSophApp() {
+  // Prevent default drag and drop behavior on the entire page, but allow our components to handle it
+  useEffect(() => {
+    const handleDragOver = (e: DragEvent) => {
+      // Only prevent default if the drag is not over our custom drop zones
+      const target = e.target as HTMLElement;
+      const isDropZone = target.closest('[data-drop-zone]');
+      if (!isDropZone) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    };
+
+    const handleDrop = (e: DragEvent) => {
+      // Only prevent default if the drop is not in our custom drop zones
+      const target = e.target as HTMLElement;
+      const isDropZone = target.closest('[data-drop-zone]');
+      if (!isDropZone) {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('Global drop prevented - not in drop zone');
+      }
+    };
+
+    // Add event listeners
+    document.addEventListener('dragover', handleDragOver);
+    document.addEventListener('drop', handleDrop);
+
+    return () => {
+      document.removeEventListener('dragover', handleDragOver);
+      document.removeEventListener('drop', handleDrop);
+    };
+  }, []);
+
   return (
     <div className="DataSoph-app font-system">
       <DarkModeProvider>
