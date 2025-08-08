@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSidebar, useChat } from '../../App';
 import WelcomeLayout from './WelcomeLayout';
 import ConversationLayout from './ConversationLayout';
+import { chatService } from '../../services/api';
 
 interface Message {
   id: number;
@@ -188,7 +189,7 @@ What specific statistical question or hypothesis would you like to investigate?`
     }
   };
   
-  const handleSendMessage = async (message: string) => {
+  const handleSendMessage = async (message: string, fileId?: string) => {
     if (!message.trim() || isTyping) return;
     
     const userMessage: Message = {
@@ -213,22 +214,66 @@ What specific statistical question or hypothesis would you like to investigate?`
     setTimeout(() => setTypingStage('processing'), 1600);
     setTimeout(() => setTypingStage('generating'), 2400);
     
-    // Generate AI response
-    setTimeout(() => {
-      const aiMessage: Message = {
-        id: Date.now() + 1,
-        type: 'assistant',
-        content: generateAIResponse(message),
-        timestamp: new Date().toLocaleTimeString('en-US', { 
-          hour: 'numeric', 
-          minute: '2-digit',
-          hour12: true 
-        })
-      };
+    try {
+      // If there's a fileId, call the real API for file analysis
+      if (fileId) {
+        const response = await chatService.sendMessage({
+          message: message.trim(),
+          user_id: 'user-' + Date.now(),
+          file_id: fileId
+        });
+        
+        const aiMessage: Message = {
+          id: Date.now() + 1,
+          type: 'assistant',
+          content: response.response,
+          timestamp: new Date().toLocaleTimeString('en-US', { 
+            hour: 'numeric', 
+            minute: '2-digit',
+            hour12: true 
+          })
+        };
+        
+        setMessages(prev => [...prev, aiMessage]);
+        setIsTyping(false);
+      } else {
+        // Use the existing mock response for regular chat
+        setTimeout(() => {
+          const aiMessage: Message = {
+            id: Date.now() + 1,
+            type: 'assistant',
+            content: generateAIResponse(message),
+            timestamp: new Date().toLocaleTimeString('en-US', { 
+              hour: 'numeric', 
+              minute: '2-digit',
+              hour12: true 
+            })
+          };
+          
+          setMessages(prev => [...prev, aiMessage]);
+          setIsTyping(false);
+        }, 3200);
+      }
+    } catch (error) {
+      console.error('Chat error:', error);
       
-      setMessages(prev => [...prev, aiMessage]);
-      setIsTyping(false);
-    }, 3200);
+      // Fallback to mock response on error
+      setTimeout(() => {
+        const aiMessage: Message = {
+          id: Date.now() + 1,
+          type: 'assistant',
+          content: "I apologize, but I'm having trouble processing your request right now. Please try again or upload your file again.",
+          timestamp: new Date().toLocaleTimeString('en-US', { 
+            hour: 'numeric', 
+            minute: '2-digit',
+            hour12: true 
+          })
+        };
+        
+        setMessages(prev => [...prev, aiMessage]);
+        setIsTyping(false);
+      }, 3200);
+    }
   };
   
   return (

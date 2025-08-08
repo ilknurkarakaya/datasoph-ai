@@ -5,7 +5,7 @@ import DataSophLogo from './DataSophLogo';
 interface WelcomeLayoutProps {
   inputValue: string;
   setInputValue: (value: string) => void;
-  onSendMessage: (message: string) => void;
+  onSendMessage: (message: string, fileId?: string) => void;
 }
 
 const WelcomeLayout: React.FC<WelcomeLayoutProps> = ({ 

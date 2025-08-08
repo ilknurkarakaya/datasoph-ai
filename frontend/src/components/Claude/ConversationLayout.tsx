@@ -16,7 +16,7 @@ interface ConversationLayoutProps {
   messages: Message[];
   inputValue: string;
   setInputValue: (value: string) => void;
-  onSendMessage: (message: string) => void;
+  onSendMessage: (message: string, fileId?: string) => void;
   isTyping?: boolean;
   typingStage?: TypingStage;
 }
@@ -30,6 +30,12 @@ const ConversationLayout: React.FC<ConversationLayoutProps> = ({
   typingStage = 'thinking'
 }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  const handleFileUploaded = (fileId: string, fileName: string) => {
+    // Automatically send a message to analyze the uploaded file
+    const analysisMessage = `Analyze the uploaded file: ${fileName}`;
+    onSendMessage(analysisMessage, fileId);
+  };
   
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -59,6 +65,7 @@ const ConversationLayout: React.FC<ConversationLayoutProps> = ({
             setInputValue={setInputValue}
             onSend={() => onSendMessage(inputValue)}
             isTyping={isTyping}
+            onFileUploaded={handleFileUploaded}
           />
         </div>
       </div>

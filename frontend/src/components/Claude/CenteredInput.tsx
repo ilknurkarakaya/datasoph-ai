@@ -1,9 +1,10 @@
 import React, { useRef } from 'react';
+import { useFileUpload } from '../../hooks/useFileUpload';
 
 interface CenteredInputProps {
   inputValue: string;
   setInputValue: (value: string) => void;
-  onSendMessage: (message: string) => void;
+  onSendMessage: (message: string, fileId?: string) => void;
   placeholder: string;
 }
 
@@ -15,6 +16,7 @@ const CenteredInput: React.FC<CenteredInputProps> = ({
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { uploadFile, isUploading, uploadError } = useFileUpload();
   
   const handleSubmit = () => {
     if (inputValue.trim()) {
@@ -38,12 +40,23 @@ const CenteredInput: React.FC<CenteredInputProps> = ({
     textarea.style.height = Math.min(textarea.scrollHeight, 200) + 'px';
   };
   
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
-      // Handle file upload logic here
-      console.log('Files selected:', Array.from(files));
+      const file = files[0]; // Handle first file
+      try {
+        const uploadedFile = await uploadFile(file);
+        if (uploadedFile) {
+          // Automatically send a message to analyze the uploaded file
+          const analysisMessage = `Analyze the uploaded file: ${uploadedFile.name}`;
+          onSendMessage(analysisMessage, uploadedFile.id);
+        }
+      } catch (error) {
+        console.error('File upload error:', error);
+      }
     }
+    // Reset input value to allow uploading the same file again
+    e.target.value = '';
   };
   
   return (
@@ -54,12 +67,24 @@ const CenteredInput: React.FC<CenteredInputProps> = ({
         {/* File Upload Button */}
         <button 
           onClick={() => fileInputRef.current?.click()}
-          className="flex-shrink-0 p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)] rounded-lg transition-colors"
-          title="Upload file"
+          disabled={isUploading}
+          className={`flex-shrink-0 p-2 rounded-lg transition-colors ${
+            isUploading 
+              ? 'text-[var(--text-secondary)] opacity-50 cursor-not-allowed' 
+              : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)]'
+          }`}
+          title={isUploading ? 'Uploading...' : 'Upload file for analysis'}
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-          </svg>
+          {isUploading ? (
+            <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+          ) : (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+            </svg>
+          )}
         </button>
         
         {/* Text Input */}
@@ -82,7 +107,7 @@ const CenteredInput: React.FC<CenteredInputProps> = ({
         {/* Send Button */}
         <button
           onClick={handleSubmit}
-          disabled={!inputValue.trim()}
+          disabled={!inputValue.trim() || isUploading}
           className="flex-shrink-0 p-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -90,6 +115,13 @@ const CenteredInput: React.FC<CenteredInputProps> = ({
           </svg>
         </button>
       </div>
+      
+      {/* Upload Error */}
+      {uploadError && (
+        <div className="text-xs text-red-500 text-center mt-2 px-2 py-1 bg-red-50 dark:bg-red-900/20 rounded">
+          {uploadError}
+        </div>
+      )}
       
       {/* Footer Text */}
       <p className="text-xs text-[var(--text-tertiary)] text-center mt-3">

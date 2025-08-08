@@ -12,7 +12,12 @@ const api = axios.create({
 
 // Chat Service
 export const chatService = {
-  sendMessage: async (message: string, fileId?: string): Promise<ChatResponse> => {
+  sendMessage: async (request: ChatRequest): Promise<ChatResponse> => {
+    const response = await api.post('/chat', request);
+    return response.data;
+  },
+
+  sendSimpleMessage: async (message: string, fileId?: string): Promise<ChatResponse> => {
     const request: ChatRequest = {
       message,
       user_id: 'default_user',
