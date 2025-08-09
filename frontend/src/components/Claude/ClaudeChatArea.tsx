@@ -29,6 +29,7 @@ const ClaudeChatArea: React.FC = () => {
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [typingStage, setTypingStage] = useState<TypingStage>('thinking');
+  const [currentAbortController, setCurrentAbortController] = useState<AbortController | null>(null);
   const { toggleSidebar } = useSidebar();
   const { hasMessages, setHasMessages, onNewChat } = useChat();
   
@@ -94,6 +95,11 @@ const ClaudeChatArea: React.FC = () => {
       setInputValue('');
       setIsTyping(false);
       setHasMessages(false);
+      // Cancel any ongoing request
+      if (currentAbortController) {
+        currentAbortController.abort();
+        setCurrentAbortController(null);
+      }
     };
     
     // Store the function globally for the context to call
@@ -102,16 +108,22 @@ const ClaudeChatArea: React.FC = () => {
     return () => {
       delete (window as any).triggerNewChat;
     };
-  }, [setHasMessages]);
+  }, [setHasMessages, currentAbortController]);
   
   // Update hasMessages when messages change
   useEffect(() => {
     setHasMessages(messages.length > 0);
   }, [messages, setHasMessages]);
   
-  // Template responses removed - now using GENIUS AI for ALL messages!
-  
   const handleSendMessage = async (message: string, fileId?: string) => {
+    // If AI is typing and user clicks send button, stop the current request
+    if (isTyping && currentAbortController) {
+      currentAbortController.abort();
+      setIsTyping(false);
+      setCurrentAbortController(null);
+      return;
+    }
+
     if (!message.trim() || isTyping) return;
     
     const userMessage: Message = {
@@ -129,6 +141,10 @@ const ClaudeChatArea: React.FC = () => {
     setInputValue('');
     setIsTyping(true);
     
+    // Create abort controller for this request
+    const abortController = new AbortController();
+    setCurrentAbortController(abortController);
+    
     // Enhanced typing stages with spiral logo animations
     setTypingStage('thinking');
     
@@ -145,19 +161,20 @@ const ClaudeChatArea: React.FC = () => {
           file_id: fileId
         });
         
-        const aiMessage: Message = {
-          id: Date.now() + 1,
-          type: 'assistant',
-          content: response.response,
-          timestamp: new Date().toLocaleTimeString('en-US', { 
-            hour: 'numeric', 
-            minute: '2-digit',
-            hour12: true 
-          })
-        };
-        
-        setMessages(prev => [...prev, aiMessage]);
-        setIsTyping(false);
+        if (!abortController.signal.aborted) {
+          const aiMessage: Message = {
+            id: Date.now() + 1,
+            type: 'assistant',
+            content: response.response,
+            timestamp: new Date().toLocaleTimeString('en-US', { 
+              hour: 'numeric', 
+              minute: '2-digit',
+              hour12: true 
+            })
+          };
+          
+          setMessages(prev => [...prev, aiMessage]);
+        }
       } else {
         // ALWAYS call the real API for ALL messages - No more mock responses!
         const response = await chatService.sendMessage({
@@ -165,39 +182,46 @@ const ClaudeChatArea: React.FC = () => {
           user_id: 'user-' + Date.now()
         });
         
-        const aiMessage: Message = {
-          id: Date.now() + 1,
-          type: 'assistant',
-          content: response.response,
-          timestamp: new Date().toLocaleTimeString('en-US', { 
-            hour: 'numeric', 
-            minute: '2-digit',
-            hour12: true 
-          })
-        };
-        
-        setMessages(prev => [...prev, aiMessage]);
-        setIsTyping(false);
+        if (!abortController.signal.aborted) {
+          const aiMessage: Message = {
+            id: Date.now() + 1,
+            type: 'assistant',
+            content: response.response,
+            timestamp: new Date().toLocaleTimeString('en-US', { 
+              hour: 'numeric', 
+              minute: '2-digit',
+              hour12: true 
+            })
+          };
+          
+          setMessages(prev => [...prev, aiMessage]);
+        }
       }
     } catch (error) {
-      console.error('Chat error:', error);
-      
-      // Fallback to mock response on error
-      setTimeout(() => {
-        const aiMessage: Message = {
-          id: Date.now() + 1,
-          type: 'assistant',
-          content: "I apologize, but I'm having trouble processing your request right now. Please try again or upload your file again.",
-          timestamp: new Date().toLocaleTimeString('en-US', { 
-            hour: 'numeric', 
-            minute: '2-digit',
-            hour12: true 
-          })
-        };
+      if (!abortController.signal.aborted) {
+        console.error('Chat error:', error);
         
-        setMessages(prev => [...prev, aiMessage]);
+        // Fallback to mock response on error
+        setTimeout(() => {
+          const aiMessage: Message = {
+            id: Date.now() + 1,
+            type: 'assistant',
+            content: "I apologize, but I'm having trouble processing your request right now. Please try again or upload your file again.",
+            timestamp: new Date().toLocaleTimeString('en-US', { 
+              hour: 'numeric', 
+              minute: '2-digit',
+              hour12: true 
+            })
+          };
+          
+          setMessages(prev => [...prev, aiMessage]);
+        }, 1000);
+      }
+    } finally {
+      if (!abortController.signal.aborted) {
         setIsTyping(false);
-      }, 3200);
+        setCurrentAbortController(null);
+      }
     }
   };
   
@@ -226,6 +250,7 @@ const ClaudeChatArea: React.FC = () => {
             inputValue={inputValue}
             setInputValue={setInputValue}
             onSendMessage={handleSendMessage}
+            isTyping={isTyping}
           />
         )}
       </div>

@@ -1,6 +1,8 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { useFileUpload } from '../../hooks/useFileUpload';
 import { useDragAndDrop } from '../../hooks/useDragAndDrop';
+import { UploadedFileInfo } from '../../types/chat';
+import InlineFileStatus from '../FileUpload/InlineFileStatus';
 
 interface ClaudeInputAreaProps {
   inputValue: string;
@@ -19,6 +21,7 @@ const ClaudeInputArea: React.FC<ClaudeInputAreaProps> = ({
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploadedFileInfo, setUploadedFileInfo] = useState<UploadedFileInfo | null>(null);
   const { uploadFile, isUploading, uploadError, validateFile } = useFileUpload();
   const { 
     isDragging, 
@@ -32,6 +35,26 @@ const ClaudeInputArea: React.FC<ClaudeInputAreaProps> = ({
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
+      handleSendClick();
+    }
+  };
+
+  const handleSendClick = () => {
+    // If AI is typing, we need to call onSend to trigger stop functionality
+    if (isTyping) {
+      onSend(); // This will trigger the stop functionality in handleSendMessage
+      return;
+    }
+
+    // Normal message sending when AI is not typing
+    if (uploadedFileInfo) {
+      // If there's an uploaded file, trigger the file uploaded callback
+      if (onFileUploaded) {
+        onFileUploaded(uploadedFileInfo.file_id, uploadedFileInfo.filename);
+      }
+      // Keep the file info for continued context
+    } else {
+      // Normal send
       onSend();
     }
   };
@@ -41,10 +64,16 @@ const ClaudeInputArea: React.FC<ClaudeInputAreaProps> = ({
     if (files && files.length > 0) {
       const file = files[0]; // Handle first file
       try {
-        const uploadedFile = await uploadFile(file);
-        if (uploadedFile && onFileUploaded) {
-          // Automatically trigger AI analysis with a standard message
-          onFileUploaded(uploadedFile.id, uploadedFile.name);
+        const uploadResult = await uploadFile(file);
+        if (uploadResult) {
+          // Only show upload confirmation - NO automatic analysis
+          setUploadedFileInfo({
+            file_id: uploadResult.id,
+            filename: uploadResult.name,
+            uploaded_at: new Date().toISOString(),
+            analysis_done: false,
+            size: uploadResult.size
+          });
         }
       } catch (error) {
         console.error('File upload error:', error);
@@ -66,23 +95,35 @@ const ClaudeInputArea: React.FC<ClaudeInputAreaProps> = ({
       }
 
       try {
-        const uploadedFile = await uploadFile(file);
-        if (uploadedFile && onFileUploaded) {
-          // Automatically trigger AI analysis with a standard message
-          onFileUploaded(uploadedFile.id, uploadedFile.name);
+        const uploadResult = await uploadFile(file);
+        if (uploadResult) {
+          // Only show upload confirmation - NO automatic analysis
+          setUploadedFileInfo({
+            file_id: uploadResult.id,
+            filename: uploadResult.name,
+            uploaded_at: new Date().toISOString(),
+            analysis_done: false,
+            size: uploadResult.size
+          });
         }
       } catch (error) {
         console.error('File drop upload error:', error);
       }
     }
   };
+
+  const handleRemoveFile = () => {
+    setUploadedFileInfo(null);
+  };
+
+  const canSend = (inputValue.trim() || uploadedFileInfo || isTyping) && !isUploading;
   
   return (
     <div className="relative">
       {/* Input Container with Drag & Drop */}
       <div 
         data-drop-zone="true"
-        className="flex items-end gap-2 relative p-3 border-[0.5px] border-[var(--border-light)] rounded-xl bg-[var(--bg-input)] shadow-sm hover:border-[var(--border-medium)] transition-colors"
+        className="flex flex-col gap-2 relative p-3 border-[0.5px] border-[var(--border-light)] rounded-xl bg-[var(--bg-input)] shadow-sm hover:border-[var(--border-medium)] transition-colors"
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
         onDragOver={handleDragOver}
@@ -90,65 +131,91 @@ const ClaudeInputArea: React.FC<ClaudeInputAreaProps> = ({
       >
         {/* Drag & Drop Overlay */}
         {isDragging && (
-                  <div style={{
-          backgroundColor: isOver 
-            ? 'var(--bg-hover)' 
-            : 'var(--bg-sidebar)',
-          opacity: isOver ? 0.95 : 0.90,
-          border: isOver ? '2px solid var(--border-medium)' : '1px solid var(--border-light)'
-        }} className="absolute inset-0 z-10 rounded-xl flex items-center justify-center transition-colors duration-200">
+          <div 
+            style={{
+              backgroundColor: isOver 
+                ? 'var(--bg-hover)' 
+                : 'var(--bg-sidebar)',
+              opacity: isOver ? 0.95 : 0.90,
+              border: isOver ? '2px solid var(--border-medium)' : '1px solid var(--border-light)'
+            }} 
+            className="absolute inset-0 z-10 rounded-xl flex items-center justify-center transition-colors duration-200"
+          >
             <div className="px-2 py-1 text-xs text-[#656d76] dark:text-[#8b949e] font-medium">
-              {isOver ? 'Drop files here' : 'Drag files here'} {/* v6.0 - CSS Variables */}
+              {isOver ? 'Drop files here' : 'Drag files here'}
             </div>
           </div>
         )}
 
-        {/* File Upload Button */}
-        <button 
-          onClick={() => fileInputRef.current?.click()}
-          disabled={isUploading || isTyping}
-          className={`p-2 rounded-md transition-colors ${
-            isUploading || isTyping 
-              ? 'text-[var(--text-secondary)] opacity-50 cursor-not-allowed' 
-              : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)]'
-          }`}
-          title={isUploading ? 'Uploading...' : 'Upload file for analysis'}
-        >
-          {isUploading ? (
-            <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-          ) : (
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-            </svg>
-          )}
-        </button>
-        
-        {/* Text Input */}
-        <div className="flex-1 relative">
-          <textarea
-            ref={textareaRef}
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={handleKeyPress}
-            placeholder="Ask like you're working with a data scientist..."
-            className="w-full resize-none border-0 bg-transparent text-base text-[var(--text-primary)] placeholder-[var(--text-placeholder)] focus:outline-none font-system pr-8"
-            rows={1}
-            style={{ minHeight: '24px', maxHeight: '120px' }}
-          />
-          
-          {/* Send Button */}
-          <button
-            onClick={onSend}
-            disabled={!inputValue.trim() || isTyping}
-            className="absolute right-0 top-1/2 transform -translate-y-1/2 p-1 text-[var(--text-secondary)] hover:text-[var(--text-primary)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        {/* Inline File Status - Elegant and thin */}
+        {uploadedFileInfo && (
+          <div className="pb-1">
+            <InlineFileStatus 
+              uploadedFile={uploadedFileInfo}
+              onRemove={handleRemoveFile}
+            />
+          </div>
+        )}
+
+        {/* Input Row */}
+        <div className="flex items-end gap-2">
+          {/* File Upload Button */}
+          <button 
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isUploading || isTyping}
+            className={`p-2 rounded-md transition-colors ${
+              isUploading || isTyping 
+                ? 'text-[var(--text-secondary)] opacity-50 cursor-not-allowed' 
+                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)]'
+            }`}
+            title={isUploading ? 'Uploading...' : 'Upload file for analysis'}
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-            </svg>
+            {isUploading ? (
+              <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            ) : (
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+              </svg>
+            )}
           </button>
+          
+          {/* Text Input */}
+          <div className="flex-1 relative">
+            <textarea
+              ref={textareaRef}
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={handleKeyPress}
+              placeholder={uploadedFileInfo ? "Ask questions about your data or send empty to analyze..." : "Ask like you're working with a data scientist..."}
+              className="w-full resize-none border-0 bg-transparent text-base text-[var(--text-primary)] placeholder-[var(--text-placeholder)] focus:outline-none font-system pr-8"
+              rows={1}
+              style={{ minHeight: '24px', maxHeight: '120px' }}
+            />
+            
+            {/* Send Button */}
+            <button
+              onClick={handleSendClick}
+              disabled={!canSend}
+              className="absolute right-0 top-1/2 transform -translate-y-1/2 p-1 text-[var(--text-secondary)] hover:text-[var(--text-primary)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              {(() => {
+                return isTyping ? (
+                  // Stop icon when AI is typing
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <rect x="6" y="6" width="12" height="12" rx="2" strokeWidth="2" />
+                  </svg>
+                ) : (
+                  // Send icon when ready to send
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                  </svg>
+                );
+              })()}
+            </button>
+          </div>
         </div>
       </div>
       
@@ -161,7 +228,7 @@ const ClaudeInputArea: React.FC<ClaudeInputAreaProps> = ({
       
       {/* Footer Text */}
       <div className="text-[10px] text-[var(--text-tertiary)] text-center mt-2 opacity-70">
-                    Datasoph can make mistakes. Verify important analysis results.
+        Datasoph can make mistakes. Verify important analysis results.
       </div>
       
       {/* Hidden File Input */}

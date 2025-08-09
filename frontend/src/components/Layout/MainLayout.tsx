@@ -182,7 +182,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           {/* Copyright and Professional Statement */}
           <div className="mt-4 pt-4 border-t border-gray-200 flex flex-col sm:flex-row justify-between items-center text-xs text-gray-500">
             <div>
-              © 2024 Datasoph. Professional data science analysis with academic rigor.
+              © 2025 Datasoph. Professional data science analysis with academic rigor.
             </div>
             <div className="mt-2 sm:mt-0">
               Think like a consultant • Communicate like a professor • Deliver like a Fortune 500 team

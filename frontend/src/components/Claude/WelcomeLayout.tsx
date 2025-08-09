@@ -6,12 +6,14 @@ interface WelcomeLayoutProps {
   inputValue: string;
   setInputValue: (value: string) => void;
   onSendMessage: (message: string, fileId?: string) => void;
+  isTyping?: boolean;
 }
 
 const WelcomeLayout: React.FC<WelcomeLayoutProps> = ({ 
   inputValue, 
   setInputValue, 
-  onSendMessage 
+  onSendMessage,
+  isTyping = false
 }) => {
   return (
     <div className="relative min-h-screen px-6">
@@ -39,6 +41,7 @@ const WelcomeLayout: React.FC<WelcomeLayoutProps> = ({
           setInputValue={setInputValue}
           onSendMessage={onSendMessage}
           placeholder="Ask like you're working with a data scientist..."
+          isTyping={isTyping}
         />
       </div>
     </div>

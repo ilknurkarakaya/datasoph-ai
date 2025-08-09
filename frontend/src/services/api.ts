@@ -52,6 +52,14 @@ export const fileService = {
     return response.data;
   },
 
+  analyzeFileImmediately: async (fileId: string, userId?: string): Promise<ChatResponse> => {
+    const response = await api.post('/analyze-file', {
+      file_id: fileId,
+      user_id: userId || 'web_user'
+    });
+    return response.data;
+  },
+
   getFileInfo: async (fileId: string) => {
     const response = await api.get(`/data/${fileId}/info`);
     return response.data;

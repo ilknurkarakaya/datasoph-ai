@@ -45,8 +45,8 @@ export const useFileUpload = () => {
         id: result.file_id,
         name: result.filename,
         filename: result.filename,
-        size: result.size,
-        type: result.type,
+        size: result.size || file.size,
+        type: result.type || file.type,
         uploadedAt: new Date().toISOString(),
       };
 

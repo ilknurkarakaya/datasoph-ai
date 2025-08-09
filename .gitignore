@@ -224,4 +224,32 @@ datasets/
 *.feather
 
 # Jupyter notebooks checkpoints
-.ipynb_checkpoints/ 
+.ipynb_checkpoints/
+
+# Backend specific
+backend/venv/
+backend/uploads/
+backend/*.log
+
+# Frontend specific  
+frontend/build/
+frontend/.env*
+!frontend/.env.example
+
+# IDE and editor files
+*.swp
+*.swo
+*~
+.vscode/settings.json
+
+# Security and credentials
+.openai_key
+.anthropic_key
+.openrouter_key
+api_keys.txt
+credentials.json
+secrets.yaml
+
+# OS specific
+*.tmp
+*.temp 

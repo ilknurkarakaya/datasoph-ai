@@ -1,12 +1,12 @@
 """
-DataSoph AI - Comprehensive Data Science Assistant
-World-class AI with full data science capabilities
+DataSoph AI - Enhanced Data Science Assistant
+World-class AI with comprehensive data science knowledge and user-controlled file analysis
 """
 
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, List
 import uvicorn
 import logging
 import os
@@ -15,14 +15,16 @@ import pandas as pd
 import numpy as np
 import uuid
 import asyncio
-import sys
-import io
-import traceback
-import matplotlib.pyplot as plt
-import seaborn as sns
 from datetime import datetime
 from dotenv import load_dotenv
-from contextlib import redirect_stdout, redirect_stderr
+
+# Import our working services only
+from .services.conversation_manager import AdvancedConversationManager, IntentCategory
+# from .services.secure_executor import SecureCodeExecutor  # Disabled for stability
+from .services.data_science_engine import ComprehensiveDataScienceEngine
+from .services.advanced_file_processor import AdvancedFileProcessor
+from .services.business_intelligence import BusinessIntelligenceEngine, BusinessDomain
+from .services.memory_system import ConversationMemory, MemoryType, ContextImportance
 
 # Load environment variables
 load_dotenv()
@@ -36,7 +38,7 @@ UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 # Initialize FastAPI app
-app = FastAPI(title="DataSoph AI", description="Comprehensive Data Science Assistant")
+app = FastAPI(title="DataSoph AI", description="Enhanced Data Science Assistant")
 
 # Add CORS middleware
 app.add_middleware(
@@ -56,12 +58,114 @@ class ChatResponse(BaseModel):
     response: str
     timestamp: str
 
-class ComprehensiveDataScienceAI:
-    """
-    Comprehensive Data Science AI with all major capabilities
-    """
+class UploadResponse(BaseModel):
+    file_id: str
+    filename: str
+    message: str
+    size: Optional[int] = None
+    type: Optional[str] = None
+
+class FileAnalysisRequest(BaseModel):
+    file_id: str
+    user_id: Optional[str] = None
+
+class FileContextManager:
+    """Manages file context and user sessions"""
     
-    def __init__(self, openai_api_key: str, model: str = "gpt-4o-mini"):
+    def __init__(self):
+        self.user_file_sessions: Dict[str, List[Dict]] = {}
+        
+    def register_file_for_user(self, user_id: str, file_id: str, filename: str) -> None:
+        """Register that a user has uploaded a specific file"""
+        if user_id not in self.user_file_sessions:
+            self.user_file_sessions[user_id] = []
+        
+        self.user_file_sessions[user_id].append({
+            "file_id": file_id,
+            "filename": filename,
+            "upload_time": datetime.now(),
+            "analysis_done": False
+        })
+        logger.info(f"📁 File registered for user {user_id}: {filename} -> {file_id}")
+    
+    def get_user_files(self, user_id: str) -> List[Dict]:
+        """Get all files for a specific user"""
+        return self.user_file_sessions.get(user_id, [])
+    
+    def get_latest_file(self, user_id: str) -> Optional[Dict]:
+        """Get the most recently uploaded file for user"""
+        files = self.get_user_files(user_id)
+        logger.info(f"🔍 Getting latest file for user {user_id}, found {len(files)} files")
+        if files:
+            logger.info(f"📄 Latest file: {files[-1]}")
+        return files[-1] if files else None
+    
+    def mark_file_analyzed(self, user_id: str, file_id: str) -> None:
+        """Mark a file as analyzed"""
+        user_files = self.get_user_files(user_id)
+        for file_info in user_files:
+            if file_info["file_id"] == file_id:
+                file_info["analysis_done"] = True
+                break
+
+class EnhancedConversationManager:
+    """Enhanced conversation management with warmth and encouragement"""
+    
+    def __init__(self):
+        self.conversation_starters = {
+            "Turkish": [
+                "Harika bir soru! 😊",
+                "Çok güzel bir yaklaşım düşünmüşsün!",
+                "Bu konuda sana yardımcı olmaktan memnuniyet duyarım!",
+                "Veri biliminde bu gerçekten önemli bir konu!",
+                "Birlikte bu problemi çözelim! 🚀",
+                "Mükemmel! Bu tam benim uzmanlık alanım! ✨",
+                "Bu soruya bayıldım! 💡"
+            ],
+            "English": [
+                "That's a fantastic question! 😊",
+                "I love this approach you're thinking about!",
+                "I'm excited to help you with this!",
+                "This is such an important aspect of data science!",
+                "Let's dive into this together! 🚀",
+                "Perfect! This is exactly my area of expertise! ✨",
+                "I'm thrilled to work on this with you! 💡"
+            ]
+        }
+        
+        self.closings = {
+            "Turkish": [
+                "\n\n💡 Başka sorularını merakla bekliyorum!",
+                "\n\nBu konuda daha derinlemesine gitmek istersen, her zaman buradayım! 😊",
+                "\n\nUmarım bu açıklama faydalı olmuştur. Başka ne öğrenmek istersin?",
+                "\n\n🚀 Veri bilimi yolculuğunda seni desteklemeye devam edeceğim!",
+                "\n\n✨ Bu analizi geliştirmek için başka fikirlerim de var!"
+            ],
+            "English": [
+                "\n\n💡 I'm here for any follow-up questions you might have!",
+                "\n\nFeel free to ask if you'd like to dive deeper into any of this! 😊",
+                "\n\nI hope this helps! What would you like to explore next?",
+                "\n\n🚀 I'm excited to continue supporting your data science journey!",
+                "\n\n✨ I have more ideas to enhance this analysis if you're interested!"
+            ]
+        }
+    
+    def add_warmth_to_response(self, response: str, language: str) -> str:
+        """Add human warmth and encouragement to technical responses"""
+        import random
+        
+        starters = self.conversation_starters[language]
+        starter = random.choice(starters)
+        
+        closings = self.closings[language]
+        closing = random.choice(closings)
+        
+        return f"{starter}\n\n{response}{closing}"
+
+class ComprehensiveDataScienceAI:
+    """Enhanced DataSoph AI with world-class data science knowledge"""
+    
+    def __init__(self, openai_api_key: str):
         self.logger = logging.getLogger(__name__)
         
         # Initialize OpenAI client
@@ -72,509 +176,660 @@ class ComprehensiveDataScienceAI:
                 api_key=openrouter_key,
                 base_url="https://openrouter.ai/api/v1"
             )
-            self.model = model
-            self.using_openrouter = True
         elif openai_api_key and openai_api_key != "placeholder":
             self.openai_client = openai.OpenAI(api_key=openai_api_key)
-            self.model = model
-            self.using_openrouter = False
         else:
-            self.logger.warning("⚠️ No API key configured")
             self.openai_client = None
-            self.using_openrouter = False
-            
-        # User profiles for personalization
-        self.user_profiles = {}
         
-        self.logger.info("🧠 Comprehensive Data Science AI initialized")
-    
+        # Initialize enhanced components
+        self.conversation_manager = AdvancedConversationManager()
+        self.enhanced_conversation = EnhancedConversationManager()
+        self.file_manager = FileContextManager()
+        self.data_science_engine = ComprehensiveDataScienceEngine()
+        self.file_processor = AdvancedFileProcessor()
+        self.business_intelligence = BusinessIntelligenceEngine()
+        self.memory_system = ConversationMemory()
+        
+        # Enhanced model selection for different tasks
+        self.model_config = {
+            "casual": "anthropic/claude-3.5-haiku",
+            "technical": "anthropic/claude-3.5-sonnet",
+            "coding": "anthropic/claude-3.5-sonnet",
+            "analysis": "openai/gpt-4o-mini"
+        }
+        
+        self.logger.info("🚀 Enhanced DataSoph AI with world-class knowledge initialized!")
+
+    async def process_message(self, message: str, user_id: str, file_id: Optional[str] = None) -> str:
+        """Process message with enhanced AI capabilities and file context awareness"""
+        
+        try:
+            # Detect intent and language
+            intent, language, confidence = self.conversation_manager.detect_intent_and_language(message, user_id)
+            context = self.conversation_manager.get_or_create_context(user_id)
+            
+            self.logger.info(f"🎯 Intent: {intent.value}, Language: {language}, Confidence: {confidence:.2f}")
+            
+            # Check if user has uploaded files recently (file context awareness)
+            if not file_id:
+                latest_file = self.file_manager.get_latest_file(user_id)
+                if latest_file:
+                    file_id = latest_file["file_id"]
+                    self.logger.info(f"🔗 Using latest uploaded file: {latest_file['filename']}")
+            
+            # Enhanced response for casual chat
+            if intent == IntentCategory.GREETING and len(message.split()) <= 3 and not file_id:
+                return self._generate_enhanced_greeting(language)
+            
+            # File analysis if provided
+            file_analysis = ""
+            if file_id:
+                file_analysis = await self._analyze_file_advanced(file_id, language)
+            
+            # Select optimal model
+            model = self._select_optimal_model(intent, file_id is not None)
+            
+            # Generate comprehensive system prompt with world-class knowledge
+            system_prompt = self._get_comprehensive_system_prompt(language, intent, file_analysis)
+            
+            # Create enhanced message
+            enhanced_message = self._create_enhanced_message(message, file_analysis, language, intent)
+            
+            # Generate AI response
+            if self.openai_client:
+                response = self.openai_client.chat.completions.create(
+                    model=model,
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": enhanced_message}
+                    ],
+                    max_tokens=2500,
+                    temperature=0.7
+                )
+                
+                ai_response = response.choices[0].message.content
+                
+                # Add warmth and encouragement to the response
+                ai_response = self.enhanced_conversation.add_warmth_to_response(ai_response, language)
+                
+                # Store in memory
+                self.memory_system.maintain_context(user_id, {
+                    'message': message,
+                    'response': ai_response,
+                    'intent': intent.value,
+                    'language': language,
+                    'file_id': file_id,
+                    'timestamp': datetime.now().isoformat()
+                })
+                
+                return ai_response
+            
+            else:
+                return self._generate_fallback_response(message, language)
+                
+        except Exception as e:
+            self.logger.error(f"❌ Error: {e}")
+            if language == "Turkish":
+                return "⚠️ Bir hata oluştu, ancak size yardımcı olmaya devam edeceğim. Lütfen tekrar deneyin."
+            else:
+                return "⚠️ An error occurred, but I'll continue helping you. Please try again."
+
+    async def analyze_file_completely(self, file_id: str, user_id: str = "default_user") -> str:
+        """Comprehensive file analysis for immediate analysis requests"""
+        try:
+            # Mark file as being analyzed
+            self.file_manager.mark_file_analyzed(user_id, file_id)
+            
+            file_data = self._get_file_data(file_id)
+            if file_data is None:
+                return "Sorry, I couldn't access the file for analysis. Please try uploading it again."
+            
+            # Detect language preference
+            language = "English"  # Default, could be enhanced with user preference detection
+            
+            # Generate comprehensive analysis
+            system_prompt = self._get_comprehensive_system_prompt(language, IntentCategory.DATA_ANALYSIS, "")
+            
+            analysis_request = f"""Please provide a comprehensive analysis of this dataset:
+
+Dataset Overview:
+- Shape: {file_data.shape[0]:,} rows × {file_data.shape[1]} columns
+- Columns: {list(file_data.columns)}
+- Data types: {dict(file_data.dtypes)}
+- Missing values: {file_data.isnull().sum().to_dict()}
+
+Sample data (first 5 rows):
+{file_data.head().to_string()}
+
+Statistical summary:
+{file_data.describe().to_string()}
+
+Please provide:
+1. Data quality assessment
+2. Key insights and patterns
+3. Recommendations for analysis
+4. Suggested next steps
+5. Business value potential
+6. Python code examples for further exploration"""
+            
+            if self.openai_client:
+                response = self.openai_client.chat.completions.create(
+                    model=self.model_config["technical"],
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": analysis_request}
+                    ],
+                    max_tokens=3000,
+                    temperature=0.7
+                )
+                
+                ai_response = response.choices[0].message.content
+                return self.enhanced_conversation.add_warmth_to_response(ai_response, language)
+            else:
+                return self._generate_fallback_analysis_response(file_data, language)
+                
+        except Exception as e:
+            self.logger.error(f"❌ File analysis error: {e}")
+            return "I encountered an error while analyzing your file. Please try again or upload a different file."
+
+    def _get_comprehensive_system_prompt(self, language: str, intent: IntentCategory, file_analysis: str) -> str:
+        """Enhanced system prompt with world-class data science knowledge"""
+        
+        if language == "Turkish":
+            base_prompt = """Sen DataSoph AI'sın - dünyanın en gelişmiş, en bilgili ve en kibar veri bilimi uzmanısın.
+
+🧠 SENİN KAPSAMLI BİLGİN:
+
+📊 VERİ BİLİMİ UZMANI:
+- İstatistik: Bayesian inference, frequentist methods, hypothesis testing, A/B testing, causal inference, survival analysis
+- Machine Learning: Supervised/unsupervised learning, deep learning, reinforcement learning, AutoML, few-shot learning
+- Algoritmalar: Classical ML (SVM, Random Forest, XGBoost, LightGBM, CatBoost), neural networks (CNN, RNN, LSTM, Transformers, GANs, VAEs)
+- Feature Engineering: Advanced selection techniques, automated feature creation, interaction terms, polynomial features
+- Model Evaluation: Advanced cross-validation, Bayesian optimization, model interpretation (SHAP, LIME, permutation importance, anchor explanations)
+
+🛠️ TEKNİK ARAÇLAR USTASI:
+- Programming: Python (pandas, numpy, scikit-learn, tensorflow, pytorch, jax), R, SQL, Scala, Julia
+- Visualization: Matplotlib, Seaborn, Plotly, D3.js, Bokeh, Altair, Tableau, PowerBI
+- Big Data: Hadoop, Spark, Kafka, Flink, distributed computing, data lakes
+- Cloud Platforms: AWS (SageMaker, S3, EMR), GCP (BigQuery, Vertex AI), Azure ML, Databricks
+- MLOps: Docker, Kubernetes, Kubeflow, MLflow, DVC, CI/CD pipelines, model monitoring
+
+💼 İŞ ANLAYIŞI:
+- Industry Applications: Healthcare, finance, retail, manufacturing, tech, energy, telecommunications
+- Business Metrics: ROI, customer lifetime value, churn prediction, price optimization, demand forecasting
+- Strategic Planning: Data strategy, team building, technology roadmaps, budget planning
+- Ethics & Governance: Bias detection, fairness metrics, privacy-preserving ML, GDPR compliance
+
+🎯 MODERN TRENDS:
+- Generative AI: Large language models, diffusion models, prompt engineering, fine-tuning
+- MLOps: Model versioning, automated retraining, drift detection, A/B testing for ML
+- Explainable AI: Interpretable models, counterfactual explanations, regulatory compliance
+- Edge Computing: Mobile ML, federated learning, on-device inference
+- Advanced Analytics: Graph neural networks, time series forecasting, causal ML, meta-learning
+
+💡 KİŞİLİK VE YAKLAŞIM:
+- Son derece kibar, sabırlı ve destekleyici
+- Karmaşık konuları basit terimlerle açıklayabilen
+- Practical örnekler veren, actionable insights sunan
+- Hem technical hem business perspektifi birleştiren
+- Sürekli öğrenmeyi teşvik eden, meraklı ve ilham verici
+- Hatalardan öğrenmeyi normal karşılayan, yapıcı
+- Her seviyedeki kullanıcıya uyum sağlayabilen (beginner to expert)
+
+🗣️ KONUŞMA STİLİN:
+- Sıcak ve samimi ama profesyonel
+- Açık ve anlaşılır açıklamalar
+- Örneklerle desteklenen teorik bilgi
+- Adım adım rehberlik
+- Cesaretlendirici ve motivasyonlu
+- Soru sormaya teşvik edici
+- "Birlikte keşfedelim" yaklaşımı
+
+🔥 ÖNEMLİ: Her zaman executable Python kodu yaz ve sonuçları yorumla!
+
+Her soruya şu yaklaşımla yanıt ver:
+1. Sorunu anlayıp empati kurun
+2. Açık ve dostane bir açıklama yap
+3. Pratik kod örnekleri ver
+4. Sonuçları business value ile bağla
+5. Sonraki adımları öner
+6. Öğrenmeye teşvik et
+
+Sen sadece bir AI değil, güvenilir bir veri bilimi mentörüsün! ❤️"""
+        
+        else:  # English
+            base_prompt = """You are DataSoph AI - the world's most advanced, knowledgeable, and genuinely caring data science expert.
+
+🧠 YOUR COMPREHENSIVE EXPERTISE:
+
+📊 DATA SCIENCE MASTERY:
+- Statistics: Bayesian inference, frequentist methods, hypothesis testing, A/B testing, causal inference, survival analysis
+- Machine Learning: Supervised/unsupervised learning, deep learning, reinforcement learning, AutoML, few-shot learning
+- Algorithms: Classical ML (SVM, Random Forest, XGBoost, LightGBM, CatBoost), neural networks (CNN, RNN, LSTM, Transformers, GANs, VAEs)
+- Feature Engineering: Advanced selection techniques, automated feature creation, interaction terms, polynomial features
+- Model Evaluation: Advanced cross-validation, Bayesian optimization, model interpretation (SHAP, LIME, permutation importance, anchor explanations)
+
+🛠️ TECHNICAL MASTERY:
+- Programming: Python (pandas, numpy, scikit-learn, tensorflow, pytorch, jax), R, SQL, Scala, Julia
+- Visualization: Matplotlib, Seaborn, Plotly, D3.js, Bokeh, Altair, Tableau, PowerBI
+- Big Data: Hadoop, Spark, Kafka, Flink, distributed computing, data lakes
+- Cloud Platforms: AWS (SageMaker, S3, EMR), GCP (BigQuery, Vertex AI), Azure ML, Databricks
+- MLOps: Docker, Kubernetes, Kubeflow, MLflow, DVC, CI/CD pipelines, model monitoring
+
+💼 BUSINESS INTELLIGENCE:
+- Industry Applications: Healthcare, finance, retail, manufacturing, tech, energy, telecommunications
+- Business Metrics: ROI, customer lifetime value, churn prediction, price optimization, demand forecasting
+- Strategic Planning: Data strategy, team building, technology roadmaps, budget planning
+- Ethics & Governance: Bias detection, fairness metrics, privacy-preserving ML, GDPR compliance
+
+🎯 CUTTING-EDGE KNOWLEDGE:
+- Generative AI: Large language models, diffusion models, prompt engineering, fine-tuning
+- MLOps: Model versioning, automated retraining, drift detection, A/B testing for ML
+- Explainable AI: Interpretable models, counterfactual explanations, regulatory compliance
+- Edge Computing: Mobile ML, federated learning, on-device inference
+- Advanced Analytics: Graph neural networks, time series forecasting, causal ML, meta-learning
+
+💡 PERSONALITY & APPROACH:
+- Exceptionally kind, patient, and supportive
+- Able to explain complex concepts in simple, relatable terms
+- Provides practical examples and actionable insights
+- Combines technical depth with business perspective
+- Encourages continuous learning and curiosity
+- Treats mistakes as learning opportunities
+- Adapts to all skill levels (beginner to expert)
+
+🗣️ COMMUNICATION STYLE:
+- Warm and friendly yet professional
+- Clear and engaging explanations
+- Theory supported by practical examples
+- Step-by-step guidance when needed
+- Encouraging and motivational
+- Promotes asking questions
+- "Let's explore this together" approach
+
+🔥 CRITICAL: Always write executable Python code and interpret results!
+
+Approach every question with:
+1. Understanding and empathy for the user's situation
+2. Clear, friendly explanations
+3. Practical code examples that work
+4. Connection to business value
+5. Suggestions for next steps
+6. Encouragement for continued learning
+
+You're not just an AI - you're a trusted data science mentor who genuinely cares about helping people succeed! ❤️"""
+
+        # Add file analysis if available
+        if file_analysis:
+            if language == "Turkish":
+                base_prompt += f"\n\n📊 **MEVCUT VERİ SETİ ANALİZİ:**\n{file_analysis}\n\n🚨 ÖNEMLİ: Bu gerçek veri setini kullan! Mock data oluşturma, yukarıdaki veri analizi sonuçlarını kullan!"
+            else:
+                base_prompt += f"\n\n📊 **CURRENT DATASET ANALYSIS:**\n{file_analysis}\n\n🚨 IMPORTANT: Use this real dataset! Don't create mock data, use the analysis results above!"
+
+        return base_prompt
+
+    def _generate_enhanced_greeting(self, language: str) -> str:
+        """Generate enhanced greeting response"""
+        if language == "Turkish":
+            return """🌟 **Merhaba! DataSoph AI'ya hoş geldiniz!**
+
+Ben dünyanın en gelişmiş veri bilimi asistanıyım ve sizinle çalışmaktan çok heyecanlıyım! 🚀
+
+🎯 **Yeteneklerim:**
+• 📊 Kapsamlı veri analizi ve EDA
+• 🤖 Makine öğrenmesi model geliştirme  
+• 📈 İleri seviye görselleştirmeler
+• 💼 İş zekası ve ROI analizi
+• 🔍 İstatistiksel analiz ve hipotez testleri
+• 💻 Otomatik kod üretimi ve çalıştırma
+• 🎨 Gelişmiş model interpretability
+• 🌐 Modern MLOps ve deployment stratejileri
+
+💡 **Nasıl yardımcı olabilirim?**
+- Veri dosyanızı yükleyin (CSV, Excel, JSON destekleniyor)
+- Veri bilimi sorunuzu sorun
+- İstatistiksel analiz konularında rehberlik isteyin
+- ML model önerileri için danışın
+
+Birlikte harika şeyler başaracağız! ✨"""
+        else:
+            return """🌟 **Hello! Welcome to DataSoph AI!**
+
+I'm the world's most advanced data science assistant, and I'm absolutely thrilled to work with you! 🚀
+
+🎯 **My Capabilities:**
+• 📊 Comprehensive data analysis and EDA
+• 🤖 Machine learning model development
+• 📈 Advanced visualizations
+• 💼 Business intelligence and ROI analysis  
+• 🔍 Statistical analysis and hypothesis testing
+• 💻 Automatic code generation and execution
+• 🎨 Advanced model interpretability
+• 🌐 Modern MLOps and deployment strategies
+
+💡 **How can I help you today?**
+- Upload your data file (CSV, Excel, JSON supported)
+- Ask your data science questions
+- Get guidance on statistical analysis
+- Consult on ML model recommendations
+
+Let's create something amazing together! ✨"""
+
+    def _select_optimal_model(self, intent: IntentCategory, has_file: bool) -> str:
+        """Select optimal model based on context"""
+        if has_file or intent == IntentCategory.DATA_ANALYSIS:
+            return self.model_config["technical"]
+        elif intent in [IntentCategory.GREETING, IntentCategory.CASUAL_CHAT]:
+            return self.model_config["casual"]
+        else:
+            return self.model_config["analysis"]
+
+    def _create_enhanced_message(self, message: str, file_analysis: str, language: str, intent: IntentCategory) -> str:
+        """Create enhanced message with context"""
+        
+        enhanced_parts = [f"KULLANICI MESAJI: {message}" if language == "Turkish" else f"USER MESSAGE: {message}"]
+        
+        if file_analysis:
+            enhanced_parts.append(file_analysis)
+        
+        if language == "Turkish":
+            enhanced_parts.append("BEKLENEN YAKLAŞIM: Uzman seviyesinde analiz, pratik öneriler, kod örnekleri ve iş değeri perspektifi")
+        else:
+            enhanced_parts.append("EXPECTED APPROACH: Expert-level analysis, practical recommendations, code examples and business value perspective")
+        
+        return "\n\n".join(enhanced_parts)
+
+    async def _analyze_file_advanced(self, file_id: str, language: str) -> str:
+        """Enhanced file analysis with actual content"""
+        try:
+            self.logger.info(f"🔬 Starting enhanced file analysis for: {file_id}")
+            file_data = self._get_file_data(file_id)
+            if file_data is None:
+                self.logger.warning(f"❌ No file data found for: {file_id}")
+                return ""
+            
+            self.logger.info(f"📊 File data loaded successfully: {file_data.shape}")
+            
+            if language == "Turkish":
+                analysis = f"""📊 VERİ SETİ DETAYLI ANALİZİ:
+
+🔍 GENEL BİLGİLER:
+• Boyut: {file_data.shape[0]:,} satır × {file_data.shape[1]} sütun
+• Eksik değer: {file_data.isnull().sum().sum()} adet
+• Sayısal sütun: {len(file_data.select_dtypes(include=[np.number]).columns)}
+• Kategorik sütun: {len(file_data.select_dtypes(include=['object']).columns)}
+
+📋 SÜTUN İSİMLERİ:
+{', '.join(file_data.columns.tolist())}
+
+📈 İLK 5 SATIR:
+{file_data.head().to_string()}
+
+📊 SAYISAL İSTATİSTİKLER:
+{file_data.describe().to_string()}
+
+🏷️ VERİ TİPLERİ:
+{file_data.dtypes.to_string()}"""
+
+                # Eksik değerler varsa detayını ekle
+                if file_data.isnull().sum().sum() > 0:
+                    analysis += f"\n\n❌ EKSİK DEĞER DETAYI:\n{file_data.isnull().sum().to_string()}"
+                
+                # Kategorik sütunlar varsa dağılımlarını ekle
+                categorical_cols = file_data.select_dtypes(include=['object']).columns
+                if len(categorical_cols) > 0:
+                    analysis += "\n\n🏷️ KATEGORİK SÜTUN DAĞILIMLARI:"
+                    for col in categorical_cols:
+                        analysis += f"\n\n{col}:\n{file_data[col].value_counts().to_string()}"
+                        
+            else:  # English
+                analysis = f"""📊 COMPREHENSIVE DATASET ANALYSIS:
+
+🔍 OVERVIEW:
+• Shape: {file_data.shape[0]:,} rows × {file_data.shape[1]} columns  
+• Missing values: {file_data.isnull().sum().sum()} total
+• Numerical columns: {len(file_data.select_dtypes(include=[np.number]).columns)}
+• Categorical columns: {len(file_data.select_dtypes(include=['object']).columns)}
+
+📋 COLUMN NAMES:
+{', '.join(file_data.columns.tolist())}
+
+📈 FIRST 5 ROWS:
+{file_data.head().to_string()}
+
+📊 NUMERICAL STATISTICS:
+{file_data.describe().to_string()}
+
+🏷️ DATA TYPES:
+{file_data.dtypes.to_string()}"""
+
+                # Add missing values detail if any
+                if file_data.isnull().sum().sum() > 0:
+                    analysis += f"\n\n❌ MISSING VALUES DETAIL:\n{file_data.isnull().sum().to_string()}"
+                
+                # Add categorical distributions if any
+                categorical_cols = file_data.select_dtypes(include=['object']).columns
+                if len(categorical_cols) > 0:
+                    analysis += "\n\n🏷️ CATEGORICAL DISTRIBUTIONS:"
+                    for col in categorical_cols:
+                        analysis += f"\n\n{col}:\n{file_data[col].value_counts().to_string()}"
+            
+            self.logger.info(f"✅ Enhanced file analysis completed: {len(analysis)} characters")
+            return analysis
+            
+        except Exception as e:
+            self.logger.error(f"❌ File analysis error: {e}")
+            return ""
+
+    async def _execute_and_enhance_response(self, response: str, file_id: str, language: str) -> str:
+        """Execute code and enhance response"""
+        
+        import re
+        code_blocks = re.findall(r'```python\n(.*?)```', response, re.DOTALL)
+        
+        if not code_blocks:
+            return response
+        
+        # Prepare execution context
+        data_context = {}
+        if file_id:
+            file_data = self._get_file_data(file_id)
+            if file_data is not None:
+                data_context = {'df': file_data, 'data': file_data}
+        
+        # Execute code blocks
+        execution_results = []
+        for code in code_blocks:
+            result = self.secure_executor.execute_code_safely(code.strip(), data_context)
+            execution_results.append(result)
+        
+        # Add results to response
+        if execution_results:
+            if language == "Turkish":
+                response += "\n\n🔥 **KOD ÇALIŞTIRMA SONUÇLARI:**\n"
+            else:
+                response += "\n\n🔥 **CODE EXECUTION RESULTS:**\n"
+            
+            for i, result in enumerate(execution_results, 1):
+                if result['success']:
+                    if language == "Turkish":
+                        response += f"\n**✅ Kod Bloğu {i} - Başarıyla Çalıştırıldı**\n"
+                    else:
+                        response += f"\n**✅ Code Block {i} - Successfully Executed**\n"
+                    
+                    if result['output']:
+                        response += f"```\n{result['output']}\n```\n"
+                else:
+                    if language == "Turkish":
+                        response += f"\n**❌ Kod Bloğu {i} - Hata:** {result['error']}\n"
+                    else:
+                        response += f"\n**❌ Code Block {i} - Error:** {result['error']}\n"
+        
+        return response
+
+    def _generate_fallback_response(self, message: str, language: str) -> str:
+        """Generate fallback response when AI is not available"""
+        if language == "Turkish":
+            return """⚠️ AI servisim şu anda aktif değil, ancak DataSoph AI yetenekleri:
+
+📊 **Veri Analizi:**
+• Otomatik EDA ve veri kalitesi değerlendirmesi
+• İstatistiksel analiz ve hipotez testleri
+• Gelişmiş görselleştirmeler
+
+🤖 **Makine Öğrenmesi:**
+• Otomatik model seçimi ve hyperparameter tuning
+• Cross-validation ve performance evaluation
+• Feature engineering önerileri
+
+💼 **İş Zekası:**
+• ROI hesaplamaları ve iş etkisi analizi
+• Executive summary ve actionable insights
+
+Lütfen sorunuzu tekrar sorun veya bir veri dosyası yükleyin."""
+        else:
+            return """⚠️ AI service not currently active, but DataSoph AI capabilities include:
+
+📊 **Data Analysis:**
+• Automated EDA and data quality assessment
+• Statistical analysis and hypothesis testing
+• Advanced visualizations
+
+🤖 **Machine Learning:**
+• Automatic model selection and hyperparameter tuning
+• Cross-validation and performance evaluation
+• Feature engineering recommendations
+
+💼 **Business Intelligence:**
+• ROI calculations and business impact analysis
+• Executive summaries and actionable insights
+
+Please restate your question or upload a data file."""
+
     def _detect_language(self, text: str) -> str:
-        """Detect the language of the input text"""
-        turkish_words = ['merhaba', 'nasılsın', 'naber', 'selam', 'iyi', 'teşekkür', 'ben', 'sen', 'ne', 'bu', 'şu', 'var', 'yok', 'için', 'ile', 'bir', 'nasıl', 'nerede', 'veri', 'analiz', 'nedir', 'hangi', 'cevap']
-        english_words = ['hello', 'hi', 'how', 'are', 'you', 'what', 'where', 'when', 'data', 'analysis', 'science', 'machine', 'learning', 'can', 'will', 'would', 'should']
+        """Detect language"""
+        turkish_words = ['merhaba', 'nasılsın', 'naber', 'selam', 'veri', 'analiz', 'nedir', 'nasıl']
+        english_words = ['hello', 'hi', 'how', 'data', 'analysis', 'what', 'can', 'help']
         
         text_lower = text.lower()
         turkish_count = sum(1 for word in turkish_words if word in text_lower)
         english_count = sum(1 for word in english_words if word in text_lower)
         
-        if turkish_count > english_count:
-            return "Turkish"
-        elif english_count > turkish_count:
-            return "English"
-        else:
-            return "Turkish" if any(char in text for char in 'çğıöşüÇĞIÖŞÜ') else "English"
-    
-    def _get_comprehensive_system_prompt(self, language: str) -> str:
-        """Get comprehensive data science system prompt based on language"""
-        
-        if language == "Turkish":
-            return """Sen DataSoph AI'sın - dünyanın en gelişmiş veri bilimi uzmanı asistanısın.
+        return "Turkish" if turkish_count >= english_count else "English"
 
-🧠 TEMEL YETENEKLERİN:
-
-📊 VERİ ANALİZİ & İŞLEME:
-- Python, R, SQL kod yazma ve optimizasyon
-- CSV, JSON, Excel, Parquet dosya okuma/yazma  
-- Veri temizleme ve preprocessing otomasyonu
-- Missing value imputation stratejileri
-- Feature engineering ve selection teknikleri
-- EDA (Exploratory Data Analysis) otomatik üretimi
-
-🤖 MAKİNE ÖĞRENMESİ:
-- Problem tipine göre algoritma önerisi (Classification, Regression, Clustering)
-- Hyperparameter tuning ve cross-validation
-- Model evaluation metrikleri (Accuracy, Precision, Recall, F1, AUC-ROC)
-- Overfitting/Underfitting tespiti ve çözümleri
-- Ensemble methods (Random Forest, XGBoost, LightGBM)
-- Deep Learning (Neural Networks, CNN, RNN, LSTM, Transformers)
-
-📈 İSTATİSTİKSEL ANALİZ:
-- Hipotez testleri (t-test, chi-square, ANOVA)
-- Korelasyon ve regresyon analizleri
-- A/B test tasarımı ve analizi  
-- Zaman serisi analizi ve forecasting
-- Bayesian analiz ve Monte Carlo simülasyonları
-
-📊 GÖRSELLEŞTİRME:
-- Matplotlib, Seaborn, Plotly ile grafik üretimi
-- İnteraktif dashboard tasarımı (Streamlit, Dash)
-- Storytelling with data yaklaşımı
-- Uygun grafik tipi seçimi ve best practices
-
-💼 İŞ ZEKASI & STRATEJI:
-- Executive summary ve teknik rapor yazımı
-- ROI hesaplamaları ve business impact analizi
-- KPI development ve tracking sistemi
-- Industry-specific use case expertise
-- Ethical AI ve bias detection
-
-🔥 ÖNEMLİ: OTOMATIK KOD ÇALIŞTIRMA YETENEĞİN VAR!
-
-📝 CEVAP FORMATIN:
-1. Soruyu anla ve açıkla
-2. Python kodu yaz (```python ve ``` arasında)
-3. Kod otomatik çalışacak ve sonuçları göreceksin
-4. Sonuçları analiz et ve kullanıcıya açıkla
-5. İç görüler ve öneriler ver
-
-🎯 ÖRNEKLERİN:
-- Veri analizi iste → Kodu yaz, çalıştır, sonuçları açıkla
-- Grafik iste → Visualization kodu yaz, oluştur, yorumla  
-- Model iste → ML kodu yaz, train et, performance göster
-- İstatistik iste → Hesaplama kodu yaz, çalıştır, sonucu açıkla
-
-💡 HER ZAMAN:
-- Kullanıcıya önce ne yapacağını açıkla
-- Kodu yaz ve çalıştır  
-- Sonuçları detaylı yorumla
-- Pratik öneriler ver
-- Sade ve anlaşılır dil kullan
-
-Kısa, öz ve pratik cevaplar ver. Kullanıcı veri bilimi bilmese bile anlayacak şekilde açıkla."""
-        
-        else:  # English
-            return """You are DataSoph AI - the world's most advanced data science expert assistant.
-
-🧠 YOUR CORE CAPABILITIES:
-
-📊 DATA ANALYSIS & PROCESSING:
-- Python, R, SQL code writing and optimization
-- CSV, JSON, Excel, Parquet file reading/writing
-- Data cleaning and preprocessing automation
-- Missing value imputation strategies
-- Feature engineering and selection techniques
-- Automatic EDA (Exploratory Data Analysis) generation
-
-🤖 MACHINE LEARNING:
-- Algorithm recommendation by problem type (Classification, Regression, Clustering)
-- Hyperparameter tuning and cross-validation
-- Model evaluation metrics (Accuracy, Precision, Recall, F1, AUC-ROC)
-- Overfitting/Underfitting detection and solutions
-- Ensemble methods (Random Forest, XGBoost, LightGBM)
-- Deep Learning (Neural Networks, CNN, RNN, LSTM, Transformers)
-
-📈 STATISTICAL ANALYSIS:
-- Hypothesis testing (t-test, chi-square, ANOVA)
-- Correlation and regression analyses
-- A/B test design and analysis
-- Time series analysis and forecasting
-- Bayesian analysis and Monte Carlo simulations
-
-📊 VISUALIZATION:
-- Graph generation with Matplotlib, Seaborn, Plotly
-- Interactive dashboard design (Streamlit, Dash)
-- Storytelling with data approach
-- Appropriate chart type selection and best practices
-
-💼 BUSINESS INTELLIGENCE & STRATEGY:
-- Executive summary and technical report writing
-- ROI calculations and business impact analysis
-- KPI development and tracking systems
-- Industry-specific use case expertise
-- Ethical AI and bias detection
-
-🔥 IMPORTANT: YOU HAVE AUTOMATIC CODE EXECUTION CAPABILITY!
-
-📝 YOUR RESPONSE FORMAT:
-1. Understand and explain the question clearly
-2. Write comprehensive Python code (between ```python and ```)
-3. Execute code automatically and capture all outputs
-4. Analyze results deeply with statistical insights
-5. Provide actionable recommendations and next steps
-
-🎯 DATA SCIENTIST CAPABILITIES:
-- Automatic EDA with statistical summaries
-- Model selection and hyperparameter optimization
-- Feature engineering and selection
-- Data visualization with interpretation
-- Statistical hypothesis testing
-- Time series analysis and forecasting
-- Deep learning model architecture design
-- Business insights and ROI analysis
-
-💡 INTELLIGENT EXECUTION:
-- Run code automatically and capture outputs
-- Show plots, tables, and statistical results
-- Interpret findings like a senior data scientist
-- Suggest improvements and next steps
-- Handle errors intelligently
-- Generate publication-ready insights
-
-🔬 ANALYSIS DEPTH:
-- Always perform statistical significance tests
-- Provide confidence intervals and p-values
-- Explain practical significance vs statistical significance
-- Suggest business actions based on findings
-- Identify potential biases and limitations
-
-Give comprehensive, actionable insights that a human data scientist would provide.
-
-RULES:
-- Write code that produces tangible results
-- Always interpret outputs statistically
-- Provide business recommendations
-- Show your work step by step
-- Handle data quality issues automatically"""
-    
-    async def process_message(self, message: str, user_id: str, file_id: Optional[str] = None) -> str:
-        """Process user message and generate intelligent response"""
-        
-        try:
-            # Detect language
-            language = self._detect_language(message)
-            
-            # Get comprehensive system prompt
-            system_prompt = self._get_comprehensive_system_prompt(language)
-            
-            # Add file analysis if file_id provided
-            file_analysis = ""
-            if file_id:
-                file_analysis = self._analyze_uploaded_file(file_id)
-            
-            # Prepare enhanced message with file context
-            enhanced_message = message
-            if file_analysis:
-                if language == "Turkish":
-                    enhanced_message = f"""KULLANICI MESAJI: {message}
-
-YÜKLENEN DOSYA ANALİZİ:
-{file_analysis}
-
-Bu dosya analizi bilgilerini kullanarak kullanıcının sorusuna detaylı ve akıllı bir cevap ver."""
-                else:
-                    enhanced_message = f"""USER MESSAGE: {message}
-
-UPLOADED FILE ANALYSIS:
-{file_analysis}
-
-Use this file analysis information to provide a detailed and intelligent answer to the user's question."""
-            
-            # Generate response
-            if self.openai_client:
-                response = self.openai_client.chat.completions.create(
-                    model=self.model,
-                    messages=[
-                        {"role": "system", "content": system_prompt},
-                        {"role": "user", "content": enhanced_message}
-                    ],
-                    max_tokens=800,
-                    temperature=0.7
-                )
-                
-                ai_response = response.choices[0].message.content
-                self.logger.info(f"✅ Generated response ({len(ai_response)} chars)")
-                
-                # Execute any Python code in the response
-                if "```python" in ai_response:
-                    code_blocks = self._extract_python_code(ai_response)
-                    file_data = None
-                    
-                    # Get file data if available
-                    if file_id:
-                        file_data = self._get_file_data(file_id)
-                    
-                    executed_results = []
-                    for code in code_blocks:
-                        result = self._execute_python_code(code, file_data)
-                        executed_results.append(result)
-                    
-                    # Add execution results to response
-                    if executed_results:
-                        ai_response = self._add_execution_results(ai_response, executed_results, language)
-                
-                return ai_response
-            
-            else:
-                # Fallback response
-                if language == "Turkish":
-                    return "⚠️ Şu anda AI servisim aktif değil, ancak veri bilimi konularında yardımcı olmaya çalışacağım."
-                else:
-                    return "⚠️ AI service not available, but I'll try to help with data science questions."
-                    
-        except Exception as e:
-            self.logger.error(f"❌ Error processing message: {e}")
-            if language == "Turkish":
-                return f"⚠️ Bir hata oluştu: {str(e)}"
-            else:
-                return f"⚠️ An error occurred: {str(e)}"
-
-    def _analyze_uploaded_file(self, file_id: str) -> str:
-        """Analyze uploaded file and return insights"""
-        try:
-            # Find the file
-            matching_files = [f for f in os.listdir(UPLOAD_DIR) if f.startswith(file_id)]
-            if not matching_files:
-                return "❌ File not found"
-            
-            file_path = os.path.join(UPLOAD_DIR, matching_files[0])
-            filename = matching_files[0]
-            
-            # Basic file info
-            file_size = os.path.getsize(file_path)
-            
-            analysis_results = []
-            analysis_results.append(f"📁 File: {filename}")
-            analysis_results.append(f"📏 Size: {file_size:,} bytes")
-            
-            # Try to analyze based on file type
-            if filename.lower().endswith('.csv'):
-                df = pd.read_csv(file_path)
-                analysis_results.append(f"📊 Rows: {len(df):,}")
-                analysis_results.append(f"📊 Columns: {len(df.columns)}")
-                analysis_results.append(f"📊 Column Names: {', '.join(df.columns[:10])}" + ("..." if len(df.columns) > 10 else ""))
-                
-                # Data types
-                analysis_results.append(f"📊 Data Types: {df.dtypes.value_counts().to_dict()}")
-                
-                # Missing values
-                missing = df.isnull().sum()
-                if missing.sum() > 0:
-                    analysis_results.append(f"⚠️ Missing Values: {missing[missing > 0].to_dict()}")
-                
-                # Basic statistics for numeric columns
-                numeric_cols = df.select_dtypes(include=[np.number]).columns
-                if len(numeric_cols) > 0:
-                    analysis_results.append(f"📈 Numeric Columns: {', '.join(numeric_cols[:5])}" + ("..." if len(numeric_cols) > 5 else ""))
-            
-            elif filename.lower().endswith(('.xlsx', '.xls')):
-                df = pd.read_excel(file_path)
-                analysis_results.append(f"📊 Rows: {len(df):,}")
-                analysis_results.append(f"📊 Columns: {len(df.columns)}")
-                analysis_results.append(f"📊 Column Names: {', '.join(df.columns[:10])}" + ("..." if len(df.columns) > 10 else ""))
-            
-            elif filename.lower().endswith('.json'):
-                with open(file_path, 'r') as f:
-                    data = pd.read_json(f)
-                    analysis_results.append(f"📊 JSON records: {len(data)}")
-                    if hasattr(data, 'columns'):
-                        analysis_results.append(f"📊 Fields: {', '.join(data.columns[:10])}" + ("..." if len(data.columns) > 10 else ""))
-            
-            return "\\n".join(analysis_results)
-            
-        except Exception as e:
-            return f"❌ File analysis error: {str(e)}"
-
-    def _execute_python_code(self, code: str, file_data: Optional[pd.DataFrame] = None) -> Dict[str, Any]:
-        """Execute Python code safely and return results"""
-        try:
-            # Create a safe execution environment
-            safe_globals = {
-                'pd': pd,
-                'np': np,
-                'plt': plt,
-                'sns': sns,
-                'print': print,
-                '__builtins__': {
-                    '__import__': __import__,
-                    'len': len,
-                    'range': range,
-                    'list': list,
-                    'dict': dict,
-                    'str': str,
-                    'int': int,
-                    'float': float,
-                    'sum': sum,
-                    'max': max,
-                    'min': min,
-                    'abs': abs,
-                    'round': round
-                },
-                'len': len,
-                'range': range,
-                'list': list,
-                'dict': dict,
-                'str': str,
-                'int': int,
-                'float': float,
-                'sum': sum,
-                'max': max,
-                'min': min,
-                'abs': abs,
-                'round': round
-            }
-            
-            # Add file data to globals if provided
-            if file_data is not None:
-                safe_globals['df'] = file_data
-                safe_globals['data'] = file_data
-            
-            # Capture output
-            output_buffer = io.StringIO()
-            error_buffer = io.StringIO()
-            
-            # Execute code and capture output
-            with redirect_stdout(output_buffer), redirect_stderr(error_buffer):
-                # If this is a single expression, evaluate and capture result
-                lines = code.strip().split('\n')
-                if len(lines) == 1 and not any(keyword in lines[0] for keyword in ['import', 'def', 'class', 'for', 'while', 'if', 'try']):
-                    # Single expression - evaluate and capture result
-                    try:
-                        result = eval(lines[0], safe_globals)
-                        if result is not None:
-                            print(result)
-                    except:
-                        # If eval fails, execute as statement
-                        exec(code, safe_globals)
-                else:
-                    # Multi-line or statement - execute normally
-                    exec(code, safe_globals)
-            
-            # Get results
-            stdout_output = output_buffer.getvalue()
-            stderr_output = error_buffer.getvalue()
-            
-            # Extract any created variables
-            results = {}
-            for key, value in safe_globals.items():
-                if not key.startswith('_') and key not in ['pd', 'np', 'plt', 'sns', 'print', 'len', 'range', 'list', 'dict', 'str', 'int', 'float', 'sum', 'max', 'min', 'abs', 'round']:
-                    if isinstance(value, (str, int, float, bool)):
-                        results[key] = value
-                    elif isinstance(value, list) and len(value) <= 10:  # Only small lists
-                        results[key] = value
-                    elif isinstance(value, dict) and len(value) <= 5:  # Only small dicts
-                        results[key] = value
-                    elif hasattr(value, 'shape') and hasattr(value, 'dtypes'):  # pandas DataFrame
-                        results[key] = f"DataFrame({value.shape[0]} rows, {value.shape[1]} columns)"
-                    elif hasattr(value, 'shape') and not hasattr(value, 'dtypes'):  # numpy array
-                        results[key] = f"Array{value.shape}"
-                    elif hasattr(value, 'dtype'):  # pandas Series
-                        results[key] = f"Series(length={len(value)})"
-                    else:
-                        # For other objects, just show type and basic info
-                        results[key] = f"{type(value).__name__} object"
-        
-            return {
-                'success': True,
-                'output': stdout_output,
-                'error': stderr_output,
-                'results': results
-            }
-            
-        except Exception as e:
-            return {
-                'success': False,
-                'output': '',
-                'error': str(e),
-                'results': {}
-            }
-    
-    def _extract_python_code(self, text: str) -> list:
-        """Extract Python code blocks from text"""
-        import re
-        pattern = r'```python\n(.*?)```'
-        matches = re.findall(pattern, text, re.DOTALL)
-        return [match.strip() for match in matches]
-    
     def _get_file_data(self, file_id: str) -> Optional[pd.DataFrame]:
-        """Get file data as DataFrame for code execution"""
+        """Get file data"""
         try:
+            self.logger.info(f"🔍 Looking for file with ID: {file_id}")
             matching_files = [f for f in os.listdir(UPLOAD_DIR) if f.startswith(file_id)]
+            self.logger.info(f"📁 Found matching files: {matching_files}")
+            
             if not matching_files:
+                self.logger.warning(f"❌ No files found for ID: {file_id}")
                 return None
             
             file_path = os.path.join(UPLOAD_DIR, matching_files[0])
             filename = matching_files[0]
+            self.logger.info(f"📄 Reading file: {filename} from {file_path}")
             
             if filename.lower().endswith('.csv'):
-                return pd.read_csv(file_path)
+                data = pd.read_csv(file_path)
+                self.logger.info(f"📊 CSV data shape: {data.shape}")
+                self.logger.info(f"📋 CSV columns: {list(data.columns)}")
+                return data
             elif filename.lower().endswith(('.xlsx', '.xls')):
-                return pd.read_excel(file_path)
+                data = pd.read_excel(file_path)
+                self.logger.info(f"📊 Excel data shape: {data.shape}")
+                return data
             elif filename.lower().endswith('.json'):
-                return pd.read_json(file_path)
+                data = pd.read_json(file_path)
+                self.logger.info(f"📊 JSON data shape: {data.shape}")
+                return data
             
+            self.logger.warning(f"❌ Unsupported file type: {filename}")
             return None
         except Exception as e:
-            self.logger.error(f"Error loading file data: {e}")
+            self.logger.error(f"❌ File reading error: {e}")
             return None
-    
-    def _add_execution_results(self, response: str, results: list, language: str) -> str:
-        """Add code execution results to the AI response"""
+
+    def _generate_fallback_response(self, message: str, language: str) -> str:
+        """Generate fallback response when AI is not available"""
         if language == "Turkish":
-            execution_header = "\n\n🔥 **KOD ÇALIŞTIRMA SONUÇLARI:**\n"
+            return """⚠️ AI servisim şu anda aktif değil, ancak DataSoph AI yetenekleri:
+
+📊 **Veri Analizi:**
+• Otomatik EDA ve veri kalitesi değerlendirmesi
+• İstatistiksel analiz ve hipotez testleri
+• Gelişmiş görselleştirmeler
+
+🤖 **Makine Öğrenmesi:**
+• Otomatik model seçimi ve hyperparameter tuning
+• Cross-validation ve performance evaluation
+• Feature engineering önerileri
+
+💼 **İş Zekası:**
+• ROI hesaplamaları ve iş etkisi analizi
+• Executive summary ve actionable insights
+
+Lütfen sorunuzu tekrar sorun veya bir veri dosyası yükleyin."""
         else:
-            execution_header = "\n\n🔥 **CODE EXECUTION RESULTS:**\n"
-        
-        execution_text = execution_header
-        
-        for i, result in enumerate(results, 1):
-            if result['success']:
-                if language == "Turkish":
-                    execution_text += f"\n**Kod Bloğu {i} - Başarılı ✅**\n"
-                else:
-                    execution_text += f"\n**Code Block {i} - Success ✅**\n"
-                
-                if result['output']:
-                    execution_text += f"```\n{result['output']}\n```\n"
-                
-                if result['results']:
-                    if language == "Turkish":
-                        execution_text += "**Oluşturulan Değişkenler:**\n"
-                    else:
-                        execution_text += "**Created Variables:**\n"
-                    
-                    for key, value in result['results'].items():
-                        execution_text += f"- `{key}`: {value}\n"
-            else:
-                if language == "Turkish":
-                    execution_text += f"\n**Kod Bloğu {i} - Hata ❌**\n"
-                    execution_text += f"```\n{result['error']}\n```\n"
-                else:
-                    execution_text += f"\n**Code Block {i} - Error ❌**\n"
-                    execution_text += f"```\n{result['error']}\n```\n"
-        
-        return response + execution_text
+            return """⚠️ AI service not currently active, but DataSoph AI capabilities include:
+
+📊 **Data Analysis:**
+• Automated EDA and data quality assessment
+• Statistical analysis and hypothesis testing
+• Advanced visualizations
+
+🤖 **Machine Learning:**
+• Automatic model selection and hyperparameter tuning
+• Cross-validation and performance evaluation
+• Feature engineering recommendations
+
+💼 **Business Intelligence:**
+• ROI calculations and business impact analysis
+• Executive summaries and actionable insights
+
+Please restate your question or upload a data file."""
+
+    def _generate_fallback_analysis_response(self, file_data: pd.DataFrame, language: str) -> str:
+        """Generate fallback analysis when AI is not available"""
+        if language == "Turkish":
+            return f"""📊 **Veri Seti Analizi (Fallback Modu)**
+
+**Temel İstatistikler:**
+- Satır sayısı: {file_data.shape[0]:,}
+- Sütun sayısı: {file_data.shape[1]}
+- Eksik değer: {file_data.isnull().sum().sum()}
+- Sayısal sütunlar: {len(file_data.select_dtypes(include=[np.number]).columns)}
+- Kategorik sütunlar: {len(file_data.select_dtypes(include=['object']).columns)}
+
+**Sütunlar:** {', '.join(file_data.columns.tolist())}
+
+Bu dosya başarıyla yüklendi! AI servisi aktif olduğunda daha detaylı analiz yapabilirim."""
+        else:
+            return f"""📊 **Dataset Analysis (Fallback Mode)**
+
+**Basic Statistics:**
+- Rows: {file_data.shape[0]:,}
+- Columns: {file_data.shape[1]}
+- Missing values: {file_data.isnull().sum().sum()}
+- Numerical columns: {len(file_data.select_dtypes(include=[np.number]).columns)}
+- Categorical columns: {len(file_data.select_dtypes(include=['object']).columns)}
+
+**Columns:** {', '.join(file_data.columns.tolist())}
+
+Your file has been successfully uploaded! I can provide more detailed analysis when AI service is active."""
 
 # Initialize the AI system
-comprehensive_ai = ComprehensiveDataScienceAI(
+enhanced_ai = ComprehensiveDataScienceAI(
     openai_api_key=os.getenv("OPENAI_API_KEY", "placeholder")
 )
 
 @app.post("/api/v1/ai/chat", response_model=ChatResponse)
 async def chat_endpoint(request: ChatRequest):
-    """Main chat endpoint for data science AI"""
-    
+    """Enhanced chat endpoint"""
     try:
-        response = await comprehensive_ai.process_message(
+        response = await enhanced_ai.process_message(
             message=request.message,
             user_id=request.user_id,
             file_id=request.file_id
@@ -586,23 +841,17 @@ async def chat_endpoint(request: ChatRequest):
         )
         
     except Exception as e:
-        logger.error(f"❌ Chat endpoint error: {e}")
+        logger.error(f"❌ Chat error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/v1/health")
 async def health_check():
-    """Health check endpoint"""
-    return {"status": "healthy", "service": "DataSoph AI"}
-
-class UploadResponse(BaseModel):
-    file_id: str
-    filename: str
-    message: str
+    """Health check"""
+    return {"status": "healthy", "service": "DataSoph AI - Enhanced System"}
 
 @app.post("/api/v1/upload", response_model=UploadResponse)
 async def upload_file(file: UploadFile = File(...)):
-    """Upload and process data files"""
-    
+    """Upload and store file - NO automatic analysis"""
     try:
         # Generate unique file ID
         file_id = str(uuid.uuid4())
@@ -615,24 +864,45 @@ async def upload_file(file: UploadFile = File(...)):
             content = await file.read()
             buffer.write(content)
         
+        # Register file for user session (using default user for now)
+        user_id = "web_user"  # Could be passed as parameter in future
+        enhanced_ai.file_manager.register_file_for_user(user_id, file_id, file.filename)
+        
         logger.info(f"📁 File uploaded: {file.filename} -> {file_id}")
         
+        # ONLY return upload confirmation - NO AI analysis yet
         return UploadResponse(
             file_id=file_id,
             filename=file.filename,
-            message=f"File {file.filename} uploaded successfully. You can now ask questions about this data."
+            message=f"✅ File '{file.filename}' uploaded successfully. You can now ask questions about this data or click 'Analyze File' to get automatic insights.",
+            size=file.size,
+            type=file.content_type
         )
         
     except Exception as e:
         logger.error(f"❌ Upload error: {e}")
         raise HTTPException(status_code=500, detail=f"Upload failed: {str(e)}")
 
+@app.post("/api/v1/analyze-file")
+async def analyze_file_immediately(request: FileAnalysisRequest):
+    """Trigger immediate analysis of uploaded file"""
+    try:
+        user_id = request.user_id or "web_user"
+        analysis_result = await enhanced_ai.analyze_file_completely(request.file_id, user_id)
+        return ChatResponse(
+            response=analysis_result,
+            timestamp=datetime.now().isoformat()
+        )
+    except Exception as e:
+        logger.error(f"❌ File analysis error: {e}")
+        raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}")
+
 if __name__ == "__main__":
-    logger.info("🚀 Starting DataSoph AI Comprehensive Data Science System")
+    logger.info("🚀 Starting Enhanced DataSoph AI")
     uvicorn.run(
         "main:app",
-        host="0.0.0.0",
+        host="0.0.0.0", 
         port=8000,
-        reload=False,  # DISABLED: Sürekli restart'ı durdur
+        reload=False,
         log_level="info"
     ) 

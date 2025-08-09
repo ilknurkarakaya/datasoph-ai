@@ -63,7 +63,11 @@ const ConversationLayout: React.FC<ConversationLayoutProps> = ({
           <ClaudeInputArea
             inputValue={inputValue}
             setInputValue={setInputValue}
-            onSend={() => onSendMessage(inputValue)}
+            onSend={() => {
+              // If typing, this will trigger stop functionality in onSendMessage
+              // If not typing, this will send the message
+              onSendMessage(inputValue);
+            }}
             isTyping={isTyping}
             onFileUploaded={handleFileUploaded}
           />

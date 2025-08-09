@@ -34,7 +34,8 @@ export interface ChatRequest {
 
 export interface ChatResponse {
   response: string;
-  status: string;
+  status?: string;
+  timestamp: string;
 }
 
 export interface ApiError {
@@ -45,9 +46,17 @@ export interface ApiError {
 export interface FileUploadResponse {
   file_id: string;
   filename: string;
-  size: number;
-  type: string;
+  size?: number;
+  type?: string;
   message: string;
+}
+
+export interface UploadedFileInfo {
+  file_id: string;
+  filename: string;
+  uploaded_at: string;
+  analysis_done: boolean;
+  size?: number;
 }
 
 // New types for DataSoph AI features
