@@ -3,7 +3,6 @@ import './index.css';
 import ClaudeSidebar from './components/Claude/ClaudeSidebar';
 import ClaudeChatArea from './components/Claude/ClaudeChatArea';
 
-// Dark mode context
 interface DarkModeContextType {
   darkMode: boolean;
   setDarkMode: (value: boolean) => void;
@@ -16,7 +15,6 @@ const DarkModeContext = createContext<DarkModeContextType>({
 
 export const useDarkMode = () => useContext(DarkModeContext);
 
-// User context
 interface UserContextType {
   userName: string;
   userRole: string;
@@ -33,7 +31,6 @@ const UserContext = createContext<UserContextType>({
 
 export const useUser = () => useContext(UserContext);
 
-// Chat context
 interface ChatContextType {
   onNewChat: () => void;
   hasMessages: boolean;
@@ -48,7 +45,6 @@ const ChatContext = createContext<ChatContextType>({
 
 export const useChat = () => useContext(ChatContext);
 
-// Sidebar context
 interface SidebarContextType {
   sidebarOpen: boolean;
   setSidebarOpen: (value: boolean) => void;
@@ -63,7 +59,6 @@ const SidebarContext = createContext<SidebarContextType>({
 
 export const useSidebar = () => useContext(SidebarContext);
 
-// Dark mode provider
 function DarkModeProvider({ children }: { children: React.ReactNode }) {
   const [darkMode, setDarkMode] = useState(() => {
     const saved = localStorage.getItem('datasoph-dark-mode');
@@ -84,7 +79,6 @@ function DarkModeProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-// User provider
 function UserProvider({ children }: { children: React.ReactNode }) {
   const [userName, setUserName] = useState(() => {
     const saved = localStorage.getItem('datasoph-user-name');
@@ -104,11 +98,10 @@ function UserProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem('datasoph-user-role', userRole);
   }, [userRole]);
   
-  // Prompt for user name on first visit
   useEffect(() => {
     const hasPrompted = localStorage.getItem('datasoph-name-prompted');
     if (!hasPrompted) {
-      const name = prompt('Merhaba! Adınız nedir?');
+      const name = prompt('Hello! What is your name?');
       if (name && name.trim()) {
         setUserName(name.trim());
       }
@@ -123,23 +116,19 @@ function UserProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-// Chat provider
 function ChatProvider({ children }: { children: React.ReactNode }) {
   const [hasMessages, setHasMessages] = useState(false);
   
   const onNewChat = () => {
     setHasMessages(false);
     
-    // Call the triggerNewChat function if it exists
     if ((window as any).triggerNewChat) {
       (window as any).triggerNewChat();
     }
     
-    // Update URL to home state without adding to history
     window.history.replaceState(null, '', window.location.pathname);
   };
   
-  // Handle browser back button
   useEffect(() => {
     const handlePopState = () => {
       if (hasMessages) {
@@ -151,7 +140,6 @@ function ChatProvider({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener('popstate', handlePopState);
   }, [hasMessages]);
   
-  // Update URL when chat starts
   useEffect(() => {
     if (hasMessages) {
       window.history.pushState({}, '', '#chat');
@@ -165,15 +153,13 @@ function ChatProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-// Sidebar provider
 function SidebarProvider({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(() => {
-    // Default to open on desktop, closed on mobile
     const saved = localStorage.getItem('datasoph-sidebar-open');
     if (saved !== null) {
       return JSON.parse(saved);
     }
-    return window.innerWidth >= 1024; // Default open on desktop
+    return window.innerWidth >= 1024;
   });
   
   const toggleSidebar = () => {
@@ -184,7 +170,6 @@ function SidebarProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem('datasoph-sidebar-open', JSON.stringify(sidebarOpen));
   }, [sidebarOpen]);
   
-  // Handle window resize
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 1024 && sidebarOpen) {
@@ -203,12 +188,9 @@ function SidebarProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-// Main DataSoph App - Exact Claude Layout with Collapsible Sidebar
 function DataSophApp() {
-  // Prevent default drag and drop behavior on the entire page, but allow our components to handle it
   useEffect(() => {
     const handleDragOver = (e: DragEvent) => {
-      // Only prevent default if the drag is not over our custom drop zones
       const target = e.target as HTMLElement;
       const isDropZone = target.closest('[data-drop-zone]');
       if (!isDropZone) {
@@ -218,7 +200,6 @@ function DataSophApp() {
     };
 
     const handleDrop = (e: DragEvent) => {
-      // Only prevent default if the drop is not in our custom drop zones
       const target = e.target as HTMLElement;
       const isDropZone = target.closest('[data-drop-zone]');
       if (!isDropZone) {
@@ -228,7 +209,6 @@ function DataSophApp() {
       }
     };
 
-    // Add event listeners
     document.addEventListener('dragover', handleDragOver);
     document.addEventListener('drop', handleDrop);
 
@@ -258,17 +238,14 @@ function AppContent() {
 
   return (
     <div className="flex h-screen relative">
-      {/* Sidebar - Collapsible with toggle */}
       <div className={`transition-all duration-300 ease-in-out ${
         sidebarOpen ? 'w-[260px]' : 'w-12'
       } bg-[var(--bg-sidebar)] flex flex-col ${sidebarOpen ? '' : 'items-center'} lg:relative absolute lg:z-auto z-50 h-full`}>
-        {/* Sidebar Content with integrated toggle */}
         {sidebarOpen ? (
           <div className="flex-1 flex flex-col overflow-hidden">
             <ClaudeSidebar />
           </div>
         ) : (
-          /* Collapsed state - only toggle button */
           <div className="p-3 flex-shrink-0">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -283,12 +260,10 @@ function AppContent() {
         )}
       </div>
       
-      {/* Main Chat Area - Adjusts to sidebar state */}
       <div className="flex-1 bg-[var(--bg-main)] flex flex-col relative">
         <ClaudeChatArea />
       </div>
       
-      {/* Mobile Overlay - Only show when sidebar is open on mobile */}
       {sidebarOpen && (
         <div 
           className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"

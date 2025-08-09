@@ -2,79 +2,66 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Claude's Exact Font System */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
 :root {
-  --font-system: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-system: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
   
-  /* Claude's Font Sizes */
-  --text-xs: 12px;     /* timestamps, footer */
-  --text-sm: 14px;     /* sidebar items, usernames, code */
-  --text-base: 16px;   /* main text, input */
-  --text-lg: 18px;     /* large text */
-  --text-xl: 20px;     /* h3 headers */
-  --text-2xl: 24px;    /* h2 subtitles */
-  --text-3xl: 28px;    /* h1 main titles */
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-base: 16px;
+  --text-lg: 18px;
+  --text-xl: 20px;
+  --text-2xl: 24px;
+  --text-3xl: 28px;
   
-  /* Claude's Exact Light Mode Colors */
-  /* Backgrounds */
-  --bg-main: #f9f6f1;                    /* Warm cream main area */
-  --bg-sidebar: #f5f2eb;                 /* One shade lighter sidebar */
-  --bg-hover: #ebe8e1;                   /* Hover states */
-  --bg-input: #f9f6f1;                   /* Input background - same as main */
+  --bg-main: #f9f6f1;
+  --bg-sidebar: #f5f2eb;
+  --bg-hover: #ebe8e1;
+  --bg-input: #f9f6f1;
   
-  /* Text Colors */
-  --text-primary: #1f2328;              /* Main text (dark gray) */
-  --text-secondary: #656d76;            /* Secondary text (medium gray) */
-  --text-tertiary: #8c959f;             /* Tertiary text (light gray) */
-  --text-placeholder: #8c959f;          /* Placeholder text */
+  --text-primary: #1f2328;
+  --text-secondary: #656d76;
+  --text-tertiary: #8c959f;
+  --text-placeholder: #8c959f;
   
-  /* Borders */
-  --border-light: #d0d7de;              /* Light borders */
-  --border-medium: #d1d9e0;             /* Medium borders */
-  --border-focus: #d0d7de;              /* Focus border - same as normal */
+  --border-light: #d0d7de;
+  --border-medium: #d1d9e0;
+  --border-focus: #d0d7de;
   
-  /* Avatars & Accents */
-  --avatar-user: #f5f2eb;               /* User avatar (same as sidebar bg) */
-  --avatar-ai: #f97316;                 /* AI avatar (orange) */
-  --accent-orange: #f97316;             /* Claude orange */
+  --avatar-user: #f5f2eb;
+  --avatar-ai: #f97316;
+  --accent-orange: #f97316;
   
-  /* Buttons */
-  --btn-primary: #f6f8fa;               /* Button background */
-  --btn-primary-hover: #f1f3f4;         /* Button hover */
-  --btn-text: #24292f;                  /* Button text */
+  --btn-primary: #f6f8fa;
+  --btn-primary-hover: #f1f3f4;
+  --btn-text: #24292f;
 }
 
-/* Claude's Exact Dark Mode Colors */
 [data-theme="dark"] {
-  /* Backgrounds */
-  --bg-main: #2a2a2a;                    /* Dark gray main area */
-  --bg-sidebar: #1e1e1e;                /* Darker sidebar */
-  --bg-hover: #3a3a3a;                  /* Hover states */
-  --bg-input: #2a2a2a;                  /* Input background */
+  --bg-main: #2a2a2a;
+  --bg-sidebar: #1e1e1e;
+  --bg-hover: #3a3a3a;
+  --bg-input: #2a2a2a;
   
-  /* Text Colors */
-  --text-primary: #f0f6fc;              /* Light text */
-  --text-secondary: #8b949e;            /* Secondary light text */
-  --text-tertiary: #6e7681;             /* Tertiary light text */
-  --text-placeholder: #7d8590;          /* Placeholder light text */
+  --text-primary: #f0f6fc;
+  --text-secondary: #8b949e;
+  --text-tertiary: #6e7681;
+  --text-placeholder: #7d8590;
   
-  /* Borders */
-  --border-light: #30363d;              /* Dark borders */
-  --border-medium: #373e47;             /* Medium borders */
-  --border-focus: #30363d;              /* Focus border - same as normal */
+  --border-light: #30363d;
+  --border-medium: #373e47;
+  --border-focus: #30363d;
   
-  /* Avatars stay same in dark mode */
-  --avatar-user: #1e1e1e;               /* User avatar (same as dark sidebar bg) */
-  --avatar-ai: #f97316;                 /* AI avatar (same orange) */
+  --avatar-user: #1e1e1e;
+  --avatar-ai: #f97316;
   
-  /* Buttons */
-  --btn-primary: #21262d;               /* Dark button background */
-  --btn-primary-hover: #30363d;         /* Dark button hover */
-  --btn-text: #e6edf3;                  /* Button text */
+  --btn-primary: #21262d;
+  --btn-primary-hover: #30363d;
+  --btn-text: #e6edf3;
 }
 
-/* Claude's Exact Base Styles */
 * {
   box-sizing: border-box;
 }
@@ -98,9 +85,10 @@ body {
   transition: background-color 0.2s ease, color 0.2s ease;
   height: 100%;
   overflow: hidden;
+  background-color: var(--bg-main);
+  color: var(--text-primary); 
 }
 
-/* Font Family Utilities */
 .font-system {
   font-family: var(--font-system);
 }
@@ -109,13 +97,6 @@ body {
   font-family: var(--font-mono);
 }
 
-/* Apply theme colors to body */
-body {
-  background-color: var(--bg-main);
-  color: var(--text-primary); 
-}
-
-/* Claude's exact scrollbar styling */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -134,19 +115,16 @@ body {
   background: var(--text-tertiary);
 }
 
-/* Smooth transitions - Claude match */
 .transition-colors {
   transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
 }
 
-/* Focus states - Claude match */
 .focus\:ring-2:focus {
   --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
   --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
   box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
 }
 
-/* Prose styling for messages */
 .prose {
   max-width: none;
   color: var(--text-primary);
@@ -218,7 +196,6 @@ body {
   color: var(--text-secondary);
 }
 
-/* DataSoph Logo Animations - Clean and Simple */
 @keyframes datasoph-spin {
   0% { 
     transform: rotate(0deg);
@@ -254,7 +231,6 @@ body {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-/* Bounce animation for typing indicator */
 @keyframes bounce {
   0%, 20%, 53%, 80%, 100% {
     transform: translate3d(0,0,0);
@@ -274,7 +250,6 @@ body {
   animation: bounce 1.4s ease-in-out infinite both;
 }
 
-/* Claude's exact responsive design */
 @media (max-width: 1024px) {
   .claude-sidebar {
     transform: translateX(-100%);

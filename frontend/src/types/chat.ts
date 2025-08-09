@@ -27,8 +27,9 @@ export interface ChatHistory {
 
 export interface ChatRequest {
   message: string;
-  user_id: string;
+  user_id?: string;
   file_id?: string;
+  context?: string;
 }
 
 export interface ChatResponse {

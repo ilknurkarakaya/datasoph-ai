@@ -7,26 +7,27 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        'system': ['-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif'],
+        'system': ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif'],
         'mono': ['"SF Mono"', 'Monaco', '"Cascadia Code"', '"Roboto Mono"', 'Consolas', '"Courier New"', 'monospace'],
       },
       fontSize: {
-        'xs': ['12px', '1.4'], // timestamps, footer
-        'sm': ['14px', '1.4'], // sidebar items, usernames, code
-        'base': ['16px', '1.5'], // main text, input
-        'lg': ['18px', '1.5'], // large text
-        'xl': ['20px', '1.5'], // h3 headers
-        '2xl': ['24px', '1.4'], // h2 subtitles
-        '3xl': ['28px', '1.3'], // h1 main titles
+        'xs': ['12px', '1.4'],
+        'sm': ['14px', '1.4'],
+        'base': ['16px', '1.5'],
+        'lg': ['18px', '1.5'],
+        'xl': ['20px', '1.5'],
+        '2xl': ['24px', '1.4'],
+        '3xl': ['28px', '1.3'],
       },
       fontWeight: {
+        'light': '300',
         'normal': '400',
         'medium': '500',
         'semibold': '600',
         'bold': '700',
+        'extrabold': '800',
       },
       colors: {
-        // Claude's exact color palette for both light and dark modes
         gray: {
           50: 'rgb(var(--gray-50-rgb) / <alpha-value>)',
           100: 'rgb(var(--gray-100-rgb) / <alpha-value>)',
@@ -39,7 +40,6 @@ module.exports = {
           800: 'rgb(var(--gray-800-rgb) / <alpha-value>)',
           900: 'rgb(var(--gray-900-rgb) / <alpha-value>)',
         },
-        // Claude's exact colors with CSS variables
         'sidebar': {
           'bg': 'var(--sidebar-bg)',
           'border': 'var(--sidebar-border)',

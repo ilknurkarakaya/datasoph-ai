@@ -162,7 +162,7 @@ const ClaudeSidebar: React.FC = () => {
             onClick={handleNewChat}
             title="Go to homepage"
           >
-            <span className="text-xl font-medium text-[var(--text-primary)] font-system">Datasoph.ai</span>
+          <span className="text-xl font-medium text-[var(--text-primary)] font-system">Datasoph.ai</span>
           </div>
           {/* Toggle Button - aligned with logo/brand */}
           <button

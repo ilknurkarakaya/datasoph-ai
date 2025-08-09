@@ -13,18 +13,26 @@ const api = axios.create({
 // Chat Service
 export const chatService = {
   sendMessage: async (request: ChatRequest): Promise<ChatResponse> => {
-    const response = await api.post('/chat', request);
+    // Backend'e uygun format
+    const backendRequest = {
+      message: request.message,
+      user_id: 'web_user',
+      file_id: request.file_id || undefined
+    };
+    
+    const response = await api.post('/ai/chat', backendRequest);
     return response.data;
   },
 
   sendSimpleMessage: async (message: string, fileId?: string): Promise<ChatResponse> => {
-    const request: ChatRequest = {
+    // Backend'e uygun format
+    const backendRequest = {
       message,
-      user_id: 'default_user',
-      ...(fileId && { file_id: fileId }),
+      user_id: 'web_user',
+      file_id: fileId || undefined
     };
 
-    const response = await api.post('/chat', request);
+    const response = await api.post('/ai/chat', backendRequest);
     return response.data;
   },
 };
