@@ -64,7 +64,7 @@ const Dashboard: React.FC<DashboardProps> = ({
         {/* Header Section */}
         <header className="text-center py-16 px-6">
           <h1 className="title-1 mb-4">
-            Welcome to DataSoph AI
+            Welcome to Datasoph
           </h1>
           <p className="body-large text-gray-600 max-w-2xl mx-auto mb-8">
             Your intelligent data science assistant. Upload data, ask questions, 

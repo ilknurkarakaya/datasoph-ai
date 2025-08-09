@@ -161,7 +161,7 @@ const ClaudeInputArea: React.FC<ClaudeInputAreaProps> = ({
       
       {/* Footer Text */}
       <div className="text-[10px] text-[var(--text-tertiary)] text-center mt-2 opacity-70">
-        Datasoph.ai can make mistakes. Verify important analysis results.
+                    Datasoph can make mistakes. Verify important analysis results.
       </div>
       
       {/* Hidden File Input */}

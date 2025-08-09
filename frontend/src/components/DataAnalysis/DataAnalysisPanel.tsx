@@ -275,7 +275,7 @@ const DataAnalysisPanel: React.FC<DataAnalysisPanelProps> = ({ fileAttachment, o
         <div className="p-6 border-b">
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-bold text-gray-900">
-              🔬 DataSoph AI Analysis
+                              🔬 Datasoph Analysis
             </h2>
             <button
               onClick={onClose}

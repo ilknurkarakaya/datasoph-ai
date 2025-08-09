@@ -565,7 +565,7 @@ print(f"\\nBest model: {best_model.upper()} with R² = {results[best_model]:.4f}
   return (
     <div className="p-6 max-w-6xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-4">DataSoph AI Code Blocks Demo</h1>
+        <h1 className="text-3xl font-bold mb-4">Datasoph Code Blocks Demo</h1>
         <p className="text-gray-600 dark:text-gray-400">
           Explore the professional code block features with syntax highlighting, execution capabilities, and data science enhancements.
         </p>

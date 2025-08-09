@@ -38,7 +38,7 @@ const ClaudeMessage: React.FC<ClaudeMessageProps> = ({ message }) => {
         {/* Header */}
         <div className="flex items-center gap-2 mb-1">
           <span className="text-sm font-medium text-[var(--text-primary)] font-system">
-            {isUser ? 'You' : 'DataSoph.ai'}
+            {isUser ? 'You' : 'Datasoph'}
           </span>
           <span className="text-xs text-[var(--text-tertiary)] font-system">
             {message.timestamp}

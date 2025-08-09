@@ -14,12 +14,28 @@ interface Message {
 type TypingStage = 'thinking' | 'analyzing' | 'processing' | 'generating';
 
 const ClaudeChatArea: React.FC = () => {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<Message[]>(() => {
+    try {
+      const savedMessages = localStorage.getItem('datasoph-chat-history');
+      if (savedMessages) {
+        const parsed = JSON.parse(savedMessages);
+        return Array.isArray(parsed) ? parsed : [];
+      }
+    } catch (error) {
+      console.error('Error loading initial messages:', error);
+    }
+    return [];
+  });
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [typingStage, setTypingStage] = useState<TypingStage>('thinking');
   const { toggleSidebar } = useSidebar();
   const { hasMessages, setHasMessages, onNewChat } = useChat();
+  
+  // Update hasMessages context on mount based on loaded messages
+  useEffect(() => {
+    setHasMessages(messages.length > 0);
+  }, [messages.length, setHasMessages]);
   
   // Load chat history on component mount and when localStorage changes
   useEffect(() => {
@@ -53,6 +69,9 @@ const ClaudeChatArea: React.FC = () => {
     const handleChatSwitch = () => {
       loadChatHistory();
     };
+    
+    // Load initially
+    loadChatHistory();
     
     window.addEventListener('storage', handleStorageChange);
     window.addEventListener('chatSwitch', handleChatSwitch);
@@ -191,7 +210,7 @@ const ClaudeChatArea: React.FC = () => {
       
       {/* Main Content Area */}
       <div className="flex-1 min-h-0">
-        {hasMessages ? (
+        {messages.length > 0 ? (
           // Conversation Layout (Input at Bottom)
           <ConversationLayout 
             messages={messages}

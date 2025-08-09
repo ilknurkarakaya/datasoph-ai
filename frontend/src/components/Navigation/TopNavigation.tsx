@@ -34,7 +34,7 @@ const TopNavigation: React.FC<TopNavigationProps> = ({
       code: 'Code Environment',
       export: 'Export Center'
     };
-    return titles[view] || 'DataSoph AI';
+    return titles[view] || 'Datasoph';
   };
 
   const getViewDescription = (view: ViewType) => {

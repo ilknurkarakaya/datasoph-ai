@@ -179,7 +179,7 @@ const CenteredInput: React.FC<CenteredInputProps> = ({
       
       {/* Footer Text */}
       <p className="text-[10px] text-[var(--text-tertiary)] text-center mt-3 opacity-70">
-        Datasoph.ai can make mistakes. Verify important analysis results.
+                    Datasoph can make mistakes. Verify important analysis results.
       </p>
       
       {/* Hidden File Input */}
