@@ -1,0 +1,184 @@
+# SOFTWARE DEVELOPMENT PRINCIPLES - CURSOR RULES
+
+## 🏗️ SOLID PRINCIPLES
+- **Single Responsibility Principle (SRP)**: Each class/function should have only one reason to change
+- **Open/Closed Principle (OCP)**: Software entities should be open for extension, closed for modification
+- **Liskov Substitution Principle (LSP)**: Subtypes must be substitutable for their base types
+- **Interface Segregation Principle (ISP)**: Clients should not depend on interfaces they don't use
+- **Dependency Inversion Principle (DIP)**: Depend on abstractions, not concretions
+
+## 🔄 CORE PRINCIPLES
+- **DRY (Don't Repeat Yourself)**: Every piece of knowledge must have single, unambiguous representation
+- **KISS (Keep It Simple, Stupid)**: Simplicity should be a key goal, avoid unnecessary complexity
+- **YAGNI (You Aren't Gonna Need It)**: Don't implement functionality until it's actually needed
+- **GRASP Principles**: General Responsibility Assignment Software Patterns
+- **Separation of Concerns**: Separate different aspects of functionality into distinct sections
+- **Principle of Least Astonishment**: System should behave as users expect it to behave
+
+## 📚 CLEAN CODE PRINCIPLES
+- **Meaningful Names**: Use intention-revealing, searchable, pronounceable names
+- **Functions Should Be Small**: Functions should do one thing and do it well (max 20 lines)
+- **Function Arguments**: Ideal number is zero, avoid more than three arguments
+- **Comments**: Code should be self-documenting, avoid redundant comments
+- **Error Handling**: Use exceptions rather than return codes, handle errors gracefully
+- **Code Formatting**: Follow consistent formatting rules across the codebase
+- **Objects and Data Structures**: Hide internal structure, expose behavior through methods
+
+## 🛡️ SECURITY PRINCIPLES
+- **Defense in Depth**: Multiple layers of security controls
+- **Principle of Least Privilege**: Grant minimum necessary access rights
+- **Fail Secure**: System should fail to a secure state
+- **Security by Design**: Build security into the system from the ground up
+- **Input Validation**: Validate all inputs at trust boundaries
+- **Output Encoding**: Encode output to prevent injection attacks
+- **Authentication & Authorization**: Verify identity and control access
+- **Data Encryption**: Encrypt sensitive data at rest and in transit
+- **SQL Injection Prevention**: Use parameterized queries and stored procedures
+- **Cross-Site Scripting (XSS) Prevention**: Sanitize user input and encode output
+- **Cross-Site Request Forgery (CSRF) Protection**: Use anti-CSRF tokens
+- **Secure Session Management**: Implement secure session handling
+
+## 🏛️ ARCHITECTURAL PATTERNS
+- **Model-View-Controller (MVC)**: Separate presentation, business logic, and data
+- **Repository Pattern**: Abstract data access layer
+- **Factory Pattern**: Create objects without specifying exact classes
+- **Observer Pattern**: Define one-to-many dependency between objects
+- **Strategy Pattern**: Define family of algorithms and make them interchangeable
+- **Command Pattern**: Encapsulate requests as objects
+- **Singleton Pattern**: Ensure class has only one instance (use sparingly)
+- **Adapter Pattern**: Allow incompatible interfaces to work together
+- **Decorator Pattern**: Add behavior to objects dynamically
+- **Facade Pattern**: Provide simplified interface to complex subsystem
+
+## 📊 PERFORMANCE PRINCIPLES
+- **Premature Optimization**: Avoid optimizing before measuring performance bottlenecks
+- **Caching Strategy**: Cache frequently accessed data and computed results
+- **Lazy Loading**: Load data only when needed
+- **Database Optimization**: Use proper indexing and query optimization
+- **Asynchronous Processing**: Use async operations for I/O-bound tasks
+- **Memory Management**: Avoid memory leaks and excessive memory usage
+- **Algorithmic Efficiency**: Choose appropriate algorithms and data structures
+- **Resource Pooling**: Reuse expensive resources like database connections
+
+## 🧪 TESTING PRINCIPLES
+- **Test-Driven Development (TDD)**: Write tests before implementation
+- **Behavior-Driven Development (BDD)**: Focus on behavior rather than implementation
+- **Unit Testing**: Test individual components in isolation
+- **Integration Testing**: Test component interactions
+- **End-to-End Testing**: Test complete user workflows
+- **Test Coverage**: Aim for 80%+ code coverage
+- **Test Pyramid**: More unit tests, fewer integration tests, minimal E2E tests
+- **Mock Objects**: Use mocks to isolate units under test
+- **Test Data Management**: Use factories and fixtures for test data
+- **Continuous Testing**: Run tests automatically in CI/CD pipeline
+
+## 📝 DOCUMENTATION PRINCIPLES
+- **Living Documentation**: Keep documentation up-to-date with code changes
+- **API Documentation**: Document all public APIs with examples
+- **Code Comments**: Explain why, not what
+- **README Files**: Provide clear setup and usage instructions
+- **Architecture Decision Records (ADRs)**: Document important architectural decisions
+- **Changelog**: Maintain version history and breaking changes
+- **User Documentation**: Write for your audience's technical level
+- **Inline Documentation**: Use docstrings and type hints
+
+## 🔧 CODING STANDARDS
+- **Naming Conventions**: Use consistent, descriptive names
+- **Code Formatting**: Follow language-specific style guides (PEP 8, ESLint, etc.)
+- **Line Length**: Keep lines under 100-120 characters
+- **Function Length**: Keep functions focused and concise
+- **Class Size**: Avoid god objects, prefer composition
+- **Nesting Depth**: Avoid deep nesting (max 3-4 levels)
+- **Magic Numbers**: Use named constants instead of magic numbers
+- **Code Organization**: Group related functionality together
+
+## 🏗️ ARCHITECTURAL PRINCIPLES
+- **Layered Architecture**: Organize code into logical layers
+- **Microservices**: Build small, independent, deployable services
+- **Event-Driven Architecture**: Use events for loose coupling
+- **Clean Architecture**: Keep business logic independent of frameworks
+- **Hexagonal Architecture**: Isolate core business logic from external concerns
+- **Domain-Driven Design**: Model software around business domain
+- **CQRS**: Separate read and write operations
+- **API-First Design**: Design APIs before implementation
+
+## 🚀 DEPLOYMENT & OPERATIONS
+- **Infrastructure as Code**: Manage infrastructure through code
+- **Continuous Integration/Deployment**: Automate build, test, and deployment
+- **Blue-Green Deployment**: Minimize deployment downtime
+- **Feature Flags**: Control feature rollout independently from deployment
+- **Monitoring & Observability**: Implement comprehensive monitoring and logging
+- **Health Checks**: Provide endpoints for service health monitoring
+- **Graceful Shutdown**: Handle shutdown signals properly
+- **Environment Parity**: Keep development, staging, and production similar
+
+## 🔄 AGILE & LEAN PRINCIPLES
+- **Customer Collaboration**: Involve customers in development process
+- **Working Software**: Prioritize working software over comprehensive documentation
+- **Responding to Change**: Adapt to changing requirements
+- **Individuals and Interactions**: Value people over processes and tools
+- **Continuous Improvement**: Regular retrospectives and process improvements
+- **Fail Fast**: Identify and address problems quickly
+- **Minimum Viable Product (MVP)**: Build smallest feature set that provides value
+
+## 🎯 QUALITY METRICS
+- **Cyclomatic Complexity**: Keep complexity low (< 10 per function)
+- **Code Duplication**: Minimize code duplication (< 5%)
+- **Technical Debt**: Regularly address technical debt
+- **Code Review**: All code should be reviewed before merging
+- **Static Analysis**: Use automated tools to catch potential issues
+- **Performance Metrics**: Monitor response times, throughput, and resource usage
+- **Bug Density**: Track and minimize defect rates
+- **Maintainability Index**: Measure how easy code is to maintain
+
+## 🔒 ERROR HANDLING & RESILIENCE
+- **Graceful Degradation**: System should degrade functionality gracefully
+- **Circuit Breaker Pattern**: Prevent cascading failures
+- **Retry Mechanisms**: Implement exponential backoff for retries
+- **Timeout Handling**: Set appropriate timeouts for external calls
+- **Bulkhead Pattern**: Isolate critical resources
+- **Health Checks**: Monitor system health continuously
+- **Logging Strategy**: Log errors with appropriate detail and context
+- **Alert Management**: Set up meaningful alerts for system issues
+
+## 📦 DEPENDENCY MANAGEMENT
+- **Version Pinning**: Pin dependency versions for reproducible builds
+- **Semantic Versioning**: Follow semver for your own packages
+- **Dependency Injection**: Use DI containers for managing dependencies
+- **Package Security**: Regularly audit dependencies for security vulnerabilities
+- **License Compliance**: Ensure dependency licenses are compatible
+- **Minimal Dependencies**: Only include necessary dependencies
+- **Dependency Updates**: Keep dependencies up-to-date but test thoroughly
+
+## 🌐 API DESIGN PRINCIPLES
+- **RESTful Design**: Follow REST principles for HTTP APIs
+- **Consistent Naming**: Use consistent naming conventions across APIs
+- **HTTP Status Codes**: Use appropriate HTTP status codes
+- **Idempotency**: Ensure safe operations are idempotent
+- **Pagination**: Implement pagination for large result sets
+- **Rate Limiting**: Protect APIs with rate limiting
+- **Versioning**: Version APIs to maintain backward compatibility
+- **Error Responses**: Provide clear, consistent error messages
+- **Content Negotiation**: Support multiple content types when appropriate
+
+## 🔧 REFACTORING PRINCIPLES
+- **Red-Green-Refactor**: TDD cycle includes refactoring step
+- **Small Steps**: Make small, incremental changes
+- **Preserve Behavior**: Ensure functionality remains unchanged
+- **Test Safety Net**: Have comprehensive tests before refactoring
+- **Code Smells**: Recognize and address common code smells
+- **Extract Method**: Break large methods into smaller ones
+- **Remove Duplication**: Eliminate code duplication through abstraction
+- **Improve Names**: Continuously improve naming as understanding grows
+
+## IMPLEMENTATION RULES:
+- Apply these principles consistently across all code
+- Review adherence to these principles in code reviews
+- Prioritize principles based on project context and constraints
+- Update and evolve principles based on team learning and industry best practices
+- Use automated tools where possible to enforce these principles
+- Document exceptions to these principles with clear justification---
+description:
+globs:
+alwaysApply: false
+---
