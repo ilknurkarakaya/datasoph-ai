@@ -1,0 +1,72 @@
+# DataSoph AI - Railway Compatible Requirements
+# Core Framework
+fastapi
+uvicorn
+python-multipart
+python-dotenv
+
+# AI and Language Models
+
+anthropic
+httpx
+tiktoken
+
+# Data Science Core (Compatible versions)
+pandas
+numpy
+scikit-learn
+scipy
+matplotlib
+seaborn
+plotly
+
+# Machine Learning Libraries
+xgboost
+lightgbm
+catboost
+optuna
+
+# Data Processing
+openpyxl
+PyPDF2
+python-docx
+
+# OCR and Computer Vision
+pytesseract
+opencv-python
+pillow
+
+# Web and API
+requests
+aiofiles
+pydantic
+pydantic-settings
+
+# Database
+SQLAlchemy
+asyncpg
+
+# Utilities
+python-dateutil
+pytz
+tqdm
+coloredlogs
+
+# Security
+cryptography
+passlib
+
+# Performance
+slowapi
+
+# Natural Language Processing (Compatible versions)
+spacy
+nltk
+textblob
+
+# File Processing
+chardet
+
+# Development Tools
+pytest
+black
