@@ -1,4 +1,4 @@
-# Render deployment workaround - Import from actual app
+# Render deployment - Import from actual app
 from backend.app.main import app
 
 # Re-export the app for uvicorn
