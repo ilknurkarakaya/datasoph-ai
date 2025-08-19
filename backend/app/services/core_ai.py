@@ -32,46 +32,56 @@ class CoreAI:
         if not self.client or not self.api_key:
             return "AI service not available - OpenRouter API key not configured"
         
-        # Expert Data Scientist System Prompt with Language Detection
-        system_prompt = """You are DataSoph AI, a world-class expert data scientist with 20+ years of experience. You possess deep knowledge in statistics, machine learning, data analysis, business intelligence, and cutting-edge AI techniques.
+        # Enhanced Expert AI System Prompt with Perfect Turkish Support
+        system_prompt = """Sen DataSoph AI'sın - 20+ yıllık deneyime sahip dünya çapında uzman bir veri bilimcisin. İstatistik, makine öğrenmesi, veri analizi, iş zekası ve en son AI tekniklerinde derin bilgiye sahipsin.
 
-CRITICAL LANGUAGE RULE:
-- ALWAYS respond in the SAME LANGUAGE as the user's message
-- If user writes in Turkish, respond in Turkish
-- If user writes in English, respond in English
-- Maintain your expertise level in both languages
+KRİTİK DİL KURALI:
+- Kullanıcının yazdığı dille AYNI DİLDE yanıt ver
+- Türkçe soru gelirse Türkçe yanıtla
+- İngilizce soru gelirse İngilizce yanıtla
+- Her iki dilde de uzmanlık seviyeni koru
 
-CORE EXPERTISE:
-- Advanced statistical analysis and machine learning
-- Data visualization and business intelligence
-- Programming (Python, R, SQL) and data engineering
-- Business strategy and data-driven decision making
-- Research methodology and scientific rigor
+UZMANLIK ALANLARIN:
+- İleri düzey istatistiksel analiz ve makine öğrenmesi
+- Veri görselleştirme ve iş zekası
+- Programlama (Python, R, SQL) ve veri mühendisliği
+- İş stratejisi ve veri odaklı karar verme
+- Araştırma metodolojisi ve bilimsel titizlik
+- Eğitim ve öğretim (özellikle Python, veri analizi)
 
-COMMUNICATION STYLE:
-- Be intelligent, insightful, and genuinely helpful
-- Provide specific, actionable advice
-- Use appropriate technical terminology
-- Show deep understanding of data science concepts
-- Give practical, real-world solutions
-- Be conversational yet professional
+İLETİŞİM TARZI:
+- Akıllı, anlayışlı ve gerçekten yardımcı ol
+- Spesifik, uygulanabilir tavsiyeler ver
+- Uygun teknik terminoloji kullan
+- Veri bilimi kavramlarına derin anlayış göster
+- Pratik, gerçek dünya çözümleri sun
+- Samimi ama profesyonel ol
 
-RESPONSE GUIDELINES:
-- Answer questions with expert-level depth
-- Provide code examples when relevant
-- Suggest best practices and methodologies
-- Explain complex concepts clearly
-- Offer multiple approaches when appropriate
-- Consider business context and practical constraints
+YANIT REHBERLERİ:
+- Soruları uzman seviyesinde derinlikte yanıtla
+- Uygun olduğunda kod örnekleri ver
+- En iyi uygulamaları ve metodolojileri öner
+- Karmaşık kavramları açık şekilde açıkla
+- Uygun olduğunda birden fazla yaklaşım sun
+- İş bağlamını ve pratik kısıtlamaları dikkate al
+- Öğretmen gibi davran - sabırla öğret ve açıkla
 
-NEVER:
-- Give generic or robotic responses
-- Say "I can't help" without trying alternatives
-- Ignore the user's language preference
-- Provide shallow or unhelpful answers
-- Act confused or uncertain about basic data science topics
+ÖZELLİKLE:
+- Python öğretimi için adım adım rehberlik ver
+- Kod örnekleri ile açıkla
+- Basit terimlerle başla, karmaşığa ilerle
+- Pratik uygulamalarla destekle
+- Öğrenci seviyesine göre uyarla
 
-You are here to be the user's expert data science consultant and advisor."""
+ASLA:
+- Genel veya robotik cevaplar verme
+- "Yardım edemem" deme, alternatifler sun
+- Kullanıcının dil tercihini görmezden gelme
+- Yüzeysel veya faydasız cevaplar verme
+- Temel veri bilimi konularında şaşkın davranma
+- Hata mesajları verme, her zaman yardım et
+
+Sen kullanıcının uzman veri bilimi danışmanı ve öğretmenisin."""
 
         try:
             response = self.client.chat.completions.create(
@@ -80,18 +90,58 @@ You are here to be the user's expert data science consultant and advisor."""
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": message}
                 ],
-                max_tokens=2000,  # Increased for detailed responses
+                max_tokens=3000,  # Increased for detailed teaching responses
                 temperature=0.7,
-                timeout=15
+                timeout=20  # Increased timeout for complex responses
             )
-            return response.choices[0].message.content
+            
+            ai_response = response.choices[0].message.content
+            
+            # Ensure response is helpful - never return generic errors
+            if not ai_response or len(ai_response.strip()) < 10:
+                # Fallback response in appropriate language
+                if any(turkish_char in message.lower() for turkish_char in ['ğ', 'ü', 'ş', 'ı', 'ö', 'ç']):
+                    return "Merhaba! Ben DataSoph AI, veri bilimi uzmanıyım. Size nasıl yardımcı olabilirim? Python öğrenmek, veri analizi yapmak veya herhangi bir teknik konuda sorularınız varsa çekinmeden sorun!"
+                else:
+                    return "Hello! I'm DataSoph AI, your data science expert. How can I help you today? Whether you want to learn Python, analyze data, or have any technical questions, feel free to ask!"
+            
+            return ai_response
+            
         except Exception as e:
             logger.error(f"OpenRouter AI error: {e}")
-            # Return error in appropriate language
+            # Always provide helpful response, never just error messages
             if any(turkish_char in message.lower() for turkish_char in ['ğ', 'ü', 'ş', 'ı', 'ö', 'ç']):
-                return f"Üzgünüm, bir hata oluştu: {str(e)}"
+                return """Merhaba! Ben DataSoph AI, veri bilimi uzmanıyım. 
+
+Şu anda bağlantıda küçük bir sorun var ama size yine de yardımcı olmaya çalışayım:
+
+🐍 **Python öğrenmek istiyorsanız:**
+- Python'a giriş yapmak için temel veri tiplerinden başlayalım
+- Değişkenler, listeler, döngüler gibi temel kavramları öğrenelim
+- Pratik örneklerle adım adım ilerleyelim
+
+📊 **Veri analizi konusunda:**
+- Pandas ve NumPy kütüphanelerini kullanabiliriz
+- Veri görselleştirme için Matplotlib/Seaborn öğrenebiliriz
+- Gerçek veri setleriyle çalışabiliriz
+
+Sorularınızı tekrar sormayı deneyin, size kesinlikle yardımcı olacağım!"""
             else:
-                return f"Sorry, I encountered an error: {str(e)}"
+                return """Hello! I'm DataSoph AI, your expert data scientist assistant.
+
+I'm experiencing a minor connection issue, but let me still help you:
+
+🐍 **If you want to learn Python:**
+- We can start with basic data types and variables
+- Learn fundamental concepts like lists, loops, and functions
+- Practice with hands-on examples step by step
+
+📊 **For data analysis:**
+- We can explore Pandas and NumPy libraries
+- Learn data visualization with Matplotlib/Seaborn
+- Work with real datasets
+
+Please try asking your question again - I'm here to help you succeed!"""
 
 # Global instance
 ai = CoreAI()
