@@ -13,9 +13,9 @@ from datetime import datetime
 import pandas as pd
 
 # Import our 3 core services
-from app.services.core_ai import ai
-from app.services.core_data import data  
-from app.services.core_ml import ml
+from backend.app.services.core_ai import ai
+from backend.app.services.core_data import data  
+from backend.app.services.core_ml import ml
 
 # Simple models
 class ChatRequest(BaseModel):
@@ -281,7 +281,7 @@ async def upload_file(file: UploadFile = File(...)):
         print(f"📁 DEBUG - Saved file: {file.filename} -> {file_id}")
         
         # Import the enhanced file handler
-        from app.services.universal_file_handler import handler
+        from backend.app.services.universal_file_handler import handler
         
         # Process file to detect type and extract content
         processing_result = handler.detect_and_process(file_path)
