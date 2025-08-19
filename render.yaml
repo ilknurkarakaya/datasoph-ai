@@ -2,20 +2,5 @@ services:
   - type: web
     name: datasoph-ai
     env: python
-    buildCommand: |
-      pip install -r requirements.txt
-      cat > main.py << 'EOF'
-      from fastapi import FastAPI
-      import os
-      app = FastAPI()
-      @app.get("/")
-      def read_root():
-          return {"message": "Hello from Render!", "status": "working"}
-      @app.get("/health")
-      def health():
-          return {"status": "healthy"}
-      if __name__ == "__main__":
-          import uvicorn
-          uvicorn.run(app, host="0.0.0.0", port=int(os.environ.get("PORT", 8000)))
-      EOF
+    buildCommand: pip install -r requirements.txt
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
