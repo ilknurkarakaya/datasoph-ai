@@ -35,11 +35,12 @@ class CoreAI:
         # Enhanced Expert AI System Prompt with Perfect Turkish Support
         system_prompt = """Sen DataSoph AI'sın - 20+ yıllık deneyime sahip dünya çapında uzman bir veri bilimcisin. İstatistik, makine öğrenmesi, veri analizi, iş zekası ve en son AI tekniklerinde derin bilgiye sahipsin.
 
-KRİTİK DİL KURALI:
-- Kullanıcının yazdığı dille AYNI DİLDE yanıt ver
-- Türkçe soru gelirse Türkçe yanıtla
-- İngilizce soru gelirse İngilizce yanıtla
-- Her iki dilde de uzmanlık seviyeni koru
+🇹🇷 KRİTİK DİL KURALI - MUTLAKA UYULACAK:
+- EĞER KULLANICI TÜRKÇE YAZIYORSA, SEN DE MUTLAKA TÜRKÇE YANIT VER
+- EĞER KULLANICI İNGİLİZCE YAZIYORSA, SEN DE İNGİLİZCE YANIT VER
+- Türkçe kelimeler görürsen (merhaba, nasılsın, analiz, veri, vs.) TÜRKÇE yanıt ver
+- İngilizce kelimeler görürsen (hello, analyze, data, vs.) İNGİLİZCE yanıt ver
+- Bu kural her şeyden önce gelir - ASLA İHLAL ETME
 
 UZMANLIK ALANLARIN:
 - İleri düzey istatistiksel analiz ve makine öğrenmesi
@@ -97,13 +98,22 @@ Sen kullanıcının uzman veri bilimi danışmanı ve öğretmenisin."""
             
             ai_response = response.choices[0].message.content
             
+            # Language detection and response validation
+            turkish_indicators = ['ğ', 'ü', 'ş', 'ı', 'ö', 'ç', 'merhaba', 'nasıl', 'nedir', 'analiz', 'veri', 'yap', 'göster', 'anlat', 'öğren', 'yardım']
+            is_turkish = any(indicator in message.lower() for indicator in turkish_indicators)
+            
             # Ensure response is helpful - never return generic errors
             if not ai_response or len(ai_response.strip()) < 10:
                 # Fallback response in appropriate language
-                if any(turkish_char in message.lower() for turkish_char in ['ğ', 'ü', 'ş', 'ı', 'ö', 'ç']):
+                if is_turkish:
                     return "Merhaba! Ben DataSoph AI, veri bilimi uzmanıyım. Size nasıl yardımcı olabilirim? Python öğrenmek, veri analizi yapmak veya herhangi bir teknik konuda sorularınız varsa çekinmeden sorun!"
                 else:
                     return "Hello! I'm DataSoph AI, your data science expert. How can I help you today? Whether you want to learn Python, analyze data, or have any technical questions, feel free to ask!"
+            
+            # Double-check language consistency
+            if is_turkish and ai_response and not any(tr_char in ai_response for tr_char in ['ğ', 'ü', 'ş', 'ı', 'ö', 'ç', 'Merhaba', 'Size', 'nasıl']):
+                # Force Turkish response if user wrote in Turkish but AI responded in English
+                return f"Merhaba! Türkçe sorduğunuz için Türkçe yanıtlıyorum: {ai_response}"
             
             return ai_response
             
